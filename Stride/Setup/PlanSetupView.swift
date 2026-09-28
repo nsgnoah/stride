@@ -12,12 +12,17 @@ struct PlanSetupView: View {
     private let isEditing: Bool
     private let startFresh: Bool
 
-    init(existing: RunnerProfile? = nil, startFresh: Bool = false) {
+    init(existing: RunnerProfile? = nil, startFresh: Bool = false, recentEffort: ActivityRecord? = nil) {
         self.startFresh = startFresh
         var p = existing ?? RunnerProfile()
         if startFresh {
-            // A new goal after a finished plan: keep her schedule, reset the date.
+            // A new goal after a finished plan: keep her schedule, reset the date, and
+            // anchor fitness to what she just ran rather than the number from months ago.
             p.raceDate = Calendar.current.date(byAdding: .weekOfYear, value: p.goal.defaultWeeks, to: .now)!
+            if let recentEffort {
+                p.recentRunMeters = recentEffort.meters
+                p.recentRunSeconds = recentEffort.durationSeconds
+            }
         }
         _profile = State(initialValue: p)
         _recentMiles = State(initialValue: Units.miles(p.recentRunMeters))

@@ -87,7 +87,10 @@ struct TodayView: View {
             .navigationDestination(for: Workout.self) { WorkoutDetailView(workout: $0) }
             .sheet(isPresented: $loggingLift) { LogActivityView() }
             .sheet(isPresented: $buildingNext) {
-                NavigationStack { PlanSetupView(existing: store.profile, startFresh: true) }
+                NavigationStack {
+                    PlanSetupView(existing: store.profile, startFresh: true,
+                                  recentEffort: PaceCalculator.bestRecentEffort(in: store.activities))
+                }
             }
         }
     }

@@ -142,11 +142,13 @@ final class AppStore {
         return nil
     }
 
-    /// Runs from the last week that were neither done nor skipped.
+    /// Runs from the last week that were neither done nor skipped. Nothing once the race
+    /// has happened — there's no plan day left to make them up on.
     var missedRuns: [(day: PlannedDay, workout: Workout)] {
         guard let plan else { return [] }
         let cal = Calendar.current
         let today = cal.startOfDay(for: .now)
+        guard plan.raceDate >= today else { return [] }
         guard let since = cal.date(byAdding: .day, value: -7, to: today) else { return [] }
         return plan.allDays
             .filter { $0.date >= since && $0.date < today }
