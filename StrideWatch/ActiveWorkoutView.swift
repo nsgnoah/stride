@@ -22,10 +22,18 @@ struct CoachingView: View {
         VStack(spacing: 6) {
             // Segment header
             HStack {
-                Text(manager.segment?.name ?? "Run")
-                    .font(.footnote.weight(.semibold))
-                    .foregroundStyle(manager.segment?.kind.tint ?? .primary)
-                    .lineLimit(1)
+                if let split = manager.lastSplit, Date.now < manager.splitBannerUntil {
+                    Text("Mile \(split.mile) · \(Formatting.duration(split.seconds))")
+                        .font(.footnote.weight(.semibold))
+                        .foregroundStyle(.green)
+                        .lineLimit(1)
+                        .transition(.opacity)
+                } else {
+                    Text(manager.segment?.name ?? "Run")
+                        .font(.footnote.weight(.semibold))
+                        .foregroundStyle(manager.segment?.kind.tint ?? .primary)
+                        .lineLimit(1)
+                }
                 Spacer()
                 Text(manager.segmentRemainingText)
                     .font(.footnote.monospacedDigit())

@@ -24,13 +24,25 @@
 		<data>
 		n57qDP4tZfLD1rCS43W0B4LQjzE=
 		</data>
+		<key>PlugIns/StrideTests.xctest/Info.plist</key>
+		<data>
+		IY0IxuJ8EHGapkGivacnOy9jheQ=
+		</data>
+		<key>PlugIns/StrideTests.xctest/StrideTests</key>
+		<data>
+		mhaestQNC7OdWoqyvru0a8PRmaw=
+		</data>
+		<key>PlugIns/StrideTests.xctest/_CodeSignature/CodeResources</key>
+		<data>
+		8Hoi/T6MoYG0h9BLSlnyTzVIVhA=
+		</data>
 		<key>PrivacyInfo.xcprivacy</key>
 		<data>
 		ucg9pita0v8d353x3NuGfxweQYU=
 		</data>
 		<key>Stride.debug.dylib</key>
 		<data>
-		9lA7FSVVjrbaSGMO6B1BNofjbTI=
+		Vuass0Qv5GXBC9gDlKMlBYSGsjA=
 		</data>
 		<key>Watch/StrideWatch.app/Assets.car</key>
 		<data>
@@ -50,15 +62,15 @@
 		</data>
 		<key>Watch/StrideWatch.app/StrideWatch</key>
 		<data>
-		Z4srIbTN/mHzKZx4NVuE9mlxrOE=
+		yieqq/VIH+W7c7De/xDyfPH7lyY=
 		</data>
 		<key>Watch/StrideWatch.app/StrideWatch.debug.dylib</key>
 		<data>
-		o25MAvzYASGF3ykAmXeQe5l990A=
+		EaXYspG4Iki+DZkcFH1HB1OScoM=
 		</data>
 		<key>Watch/StrideWatch.app/_CodeSignature/CodeResources</key>
 		<data>
-		oUShSUzcrBoKM7zngC4OWYKYeJ0=
+		Ua4HStpkZvJUcwWRf1M6J6afZtY=
 		</data>
 		<key>Watch/StrideWatch.app/__preview.dylib</key>
 		<data>
@@ -92,6 +104,27 @@
 			UXdrZVi4sUCH+3lLXWlBSW078qv0YdvsAeug6xfCxW8=
 			</data>
 		</dict>
+		<key>PlugIns/StrideTests.xctest/Info.plist</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			n/T1VTl1Vhy5Tdl2D1hQmi0ezQ7jWfQO8OLwBYC+2B8=
+			</data>
+		</dict>
+		<key>PlugIns/StrideTests.xctest/StrideTests</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			3Mg4LP8ukmC03bKBCgKASttVsgJ50tOD91ybKa+jxHs=
+			</data>
+		</dict>
+		<key>PlugIns/StrideTests.xctest/_CodeSignature/CodeResources</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			ROm6hIeEZdjoYT0GzWhYOtrE/T2jB/r/r2hXTB5MpQ4=
+			</data>
+		</dict>
 		<key>PrivacyInfo.xcprivacy</key>
 		<dict>
 			<key>hash2</key>
@@ -103,7 +136,7 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			UhBPij044Dwd9V5W/brPhuIodVBGJxuO07lk7uhqCC0=
+			tK/Vnzjp/aiGzgWVOAfCGrbkI3ER+7rJiNsbgDhZZaA=
 			</data>
 		</dict>
 		<key>Watch/StrideWatch.app/Assets.car</key>
@@ -138,21 +171,21 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			VmGcCoP5wy7YA2qph8Q2F/MHsfWlu9FDGkKuHKyYVXg=
+			VMyoqYuohDqsp/c2eQsRNOUopJ6h9ak9vqPAs2QOUSQ=
 			</data>
 		</dict>
 		<key>Watch/StrideWatch.app/StrideWatch.debug.dylib</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			rTG5d3J9i9noiIuTZJGoRHTsw6+JfERAwhwb0UZlOr0=
+			4DRU5nHX8TUnTFja+MjCyxzmTGBlnnQmIq4wdCmfOCY=
 			</data>
 		</dict>
 		<key>Watch/StrideWatch.app/_CodeSignature/CodeResources</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			nkmbr4UmwN1JYVOh6TApJ4prsHgs0sXSm57nY632NkA=
+			tkIXbf92v7w4aCx25ORyct1L+q7Xo/sZxzSK4N4Uhro=
 			</data>
 		</dict>
 		<key>Watch/StrideWatch.app/__preview.dylib</key>

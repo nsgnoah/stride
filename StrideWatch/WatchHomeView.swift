@@ -43,6 +43,38 @@ struct WatchHomeView: View {
                     }
                     .buttonStyle(.bordered)
 
+                    // Lifts and mobility for today, checked off from the wrist.
+                    let extras = (store.today?.workouts ?? []).filter { !$0.type.isRun && $0.type != .rest }
+                    if !extras.isEmpty {
+                        Divider()
+                        Text("Also today").font(.footnote).foregroundStyle(.secondary)
+                        ForEach(extras) { workout in
+                            let done = store.isCompleted(workout)
+                            HStack {
+                                if let routine = RoutineLibrary.routine(workout.standaloneRoutineID) {
+                                    NavigationLink { WatchRoutineView(routine: routine) } label: {
+                                        Label(workout.title, systemImage: workout.type.symbol).foregroundStyle(workout.type.tint)
+                                    }
+                                    .buttonStyle(.plain)
+                                } else {
+                                    Label(workout.title, systemImage: workout.type.symbol).foregroundStyle(workout.type.tint)
+                                }
+                                Spacer()
+                                Button {
+                                    let record = ActivityRecord(date: .now, type: workout.type, plannedWorkoutID: workout.id, durationSeconds: 0, meters: 0)
+                                    store.record(record)
+                                    Connectivity.shared.send(activity: record)
+                                } label: {
+                                    Image(systemName: done ? "checkmark.circle.fill" : "circle")
+                                        .foregroundStyle(done ? .green : .secondary)
+                                }
+                                .buttonStyle(.plain)
+                                .disabled(done)
+                            }
+                            .font(.footnote)
+                        }
+                    }
+
                     if let week = store.thisWeek {
                         Divider()
                         Text("This week").font(.footnote).foregroundStyle(.secondary)

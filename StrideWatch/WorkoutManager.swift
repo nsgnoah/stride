@@ -25,6 +25,9 @@ final class WorkoutManager: NSObject {
     var currentPace: Pace?              // sec/mi over the last ~30 s
     var coaching: Coaching = .none
     var completed: ActivityRecord?
+    /// Most recent mile split, shown briefly in place of the segment name.
+    var lastSplit: ActivityRecord.Split?
+    var splitBannerUntil: Date = .distantPast
 
     // HealthKit
     private let healthStore = HKHealthStore()
@@ -211,6 +214,8 @@ final class WorkoutManager: NSObject {
         currentPace = nil
         coaching = .none
         completed = nil
+        lastSplit = nil
+        splitBannerUntil = .distantPast
         samples = []
         splits = []
         heartRateSamples = []
@@ -259,7 +264,11 @@ final class WorkoutManager: NSObject {
         let mile = Int(Units.miles(distance))
         if mile > splits.count {
             let previous = splits.last.map { total(of: $0) } ?? 0
-            splits.append(.init(mile: mile, seconds: elapsed - previous))
+            let split = ActivityRecord.Split(mile: mile, seconds: elapsed - previous)
+            splits.append(split)
+            lastSplit = split
+            splitBannerUntil = Date.now.addingTimeInterval(8)
+            WKInterfaceDevice.current().play(.notification)
         }
     }
 

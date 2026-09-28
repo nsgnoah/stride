@@ -9,6 +9,10 @@ final class AppStore {
     var profile: RunnerProfile?
     var plan: TrainingPlan?
     var activities: [ActivityRecord] = []
+    /// Hour of the morning reminder on run days; nil when reminders are off.
+    var reminderHour: Int? {
+        didSet { save() }
+    }
 
     private let url: URL
 
@@ -16,6 +20,12 @@ final class AppStore {
         var profile: RunnerProfile?
         var plan: TrainingPlan?
         var activities: [ActivityRecord]
+        var reminderHour: Int?
+    }
+
+    /// Workout ids that no longer need a reminder.
+    var settledWorkoutIDs: Set<UUID> {
+        Set(activities.compactMap(\.plannedWorkoutID)).union(plan?.skipped ?? [])
     }
 
     init(filename: String = "stride.json") {
@@ -28,7 +38,26 @@ final class AppStore {
 
     func createPlan(from profile: RunnerProfile) {
         self.profile = profile
-        plan = PlanGenerator(runner: profile).makePlan()
+        // Rebuilding keeps the original start so week numbers and finished workouts line up.
+        let start = plan?.startDate ?? .now
+        var newPlan = PlanGenerator(runner: profile, startDate: start).makePlan()
+        newPlan.skipped = plan?.skipped ?? []
+        plan = newPlan
+        save()
+    }
+
+    func skip(_ workout: Workout) {
+        plan?.skipped.insert(workout.id)
+        save()
+    }
+
+    func unskip(_ workout: Workout) {
+        plan?.skipped.remove(workout.id)
+        save()
+    }
+
+    func move(_ workout: Workout, to date: Date) {
+        plan?.move(workoutID: workout.id, to: date)
         save()
     }
 
@@ -83,17 +112,32 @@ final class AppStore {
         guard let plan else { return nil }
         let start = Calendar.current.startOfDay(for: .now)
         for day in plan.allDays where day.date >= start {
-            if let w = day.workouts.first(where: { $0.type.isRun && !isCompleted($0) }) {
+            if let w = day.workouts.first(where: { $0.type.isRun && !isCompleted($0) && !plan.isSkipped($0) }) {
                 return (day, w)
             }
         }
         return nil
     }
 
+    /// Runs from the last week that were neither done nor skipped.
+    var missedRuns: [(day: PlannedDay, workout: Workout)] {
+        guard let plan else { return [] }
+        let cal = Calendar.current
+        let today = cal.startOfDay(for: .now)
+        guard let since = cal.date(byAdding: .day, value: -7, to: today) else { return [] }
+        return plan.allDays
+            .filter { $0.date >= since && $0.date < today }
+            .flatMap { day in
+                day.workouts
+                    .filter { $0.type.isRun && !isCompleted($0) && !plan.isSkipped($0) }
+                    .map { (day, $0) }
+            }
+    }
+
     // MARK: - Persistence
 
     func save() {
-        let snap = Snapshot(profile: profile, plan: plan, activities: activities)
+        let snap = Snapshot(profile: profile, plan: plan, activities: activities, reminderHour: reminderHour)
         do {
             let data = try JSONEncoder().encode(snap)
             try data.write(to: url, options: .atomic)
@@ -108,5 +152,6 @@ final class AppStore {
         profile = snap.profile
         plan = snap.plan
         activities = snap.activities
+        reminderHour = snap.reminderHour
     }
 }

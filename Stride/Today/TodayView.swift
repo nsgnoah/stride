@@ -30,6 +30,30 @@ struct TodayView: View {
                     Section { Text("Plan complete. Build a new one from Settings.") }
                 }
 
+                let missed = store.missedRuns
+                if !missed.isEmpty {
+                    Section {
+                        ForEach(missed, id: \.workout.id) { item in
+                            VStack(alignment: .leading, spacing: 8) {
+                                NavigationLink(value: item.workout) { WorkoutRow(workout: item.workout) }
+                                HStack {
+                                    Button("Do it today") { store.move(item.workout, to: .now) }
+                                        .buttonStyle(.borderedProminent).controlSize(.small)
+                                    Button("Skip") { store.skip(item.workout) }
+                                        .buttonStyle(.bordered).controlSize(.small)
+                                    Spacer()
+                                    Text(item.day.date.formatted(.dateTime.weekday(.abbreviated)))
+                                        .font(.caption).foregroundStyle(.secondary)
+                                }
+                            }
+                        }
+                    } header: {
+                        Text("Missed")
+                    } footer: {
+                        Text("Skipping is fine — one missed run never broke a plan. Don't try to make up more than one.")
+                    }
+                }
+
                 if let next = store.nextRun, !Calendar.current.isDateInToday(next.day.date) {
                     Section("Next run · \(next.day.date.formatted(.dateTime.weekday(.wide)))") {
                         NavigationLink(value: next.workout) { WorkoutRow(workout: next.workout) }

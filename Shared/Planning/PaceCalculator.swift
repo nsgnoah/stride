@@ -18,6 +18,24 @@ enum PaceCalculator {
         predictedTime(forMeters: target, fromMeters: d1, seconds: t1) / Units.miles(target)
     }
 
+    /// The recorded effort that best represents current fitness: the tempo or race
+    /// (and, failing those, the long run) from the last six weeks with the fastest
+    /// Riegel-equivalent 10K. Easy runs are deliberately ignored — their pace says
+    /// nothing about what she can race.
+    static func bestRecentEffort(in activities: [ActivityRecord], now: Date = .now) -> ActivityRecord? {
+        let cutoff = now.addingTimeInterval(-42 * 24 * 3600)
+        let candidates = activities.filter {
+            $0.date >= cutoff && $0.meters >= Units.meters(miles: 1) && $0.durationSeconds > 0
+                && [.tempo, .race, .long].contains($0.type)
+        }
+        let hard = candidates.filter { $0.type != .long }
+        let pool = hard.isEmpty ? candidates : hard
+        return pool.min { a, b in
+            predictedTime(forMeters: 10000, fromMeters: a.meters, seconds: a.durationSeconds)
+                < predictedTime(forMeters: 10000, fromMeters: b.meters, seconds: b.durationSeconds)
+        }
+    }
+
     static func profile(for runner: RunnerProfile) -> PaceProfile {
         let d1 = runner.recentRunMeters
         let t1 = runner.recentRunSeconds

@@ -46,6 +46,20 @@ targets:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: co.nsgsolutions.Stride
         TARGETED_DEVICE_FAMILY: "1"
+    scheme:
+      testTargets: [StrideTests]
+
+  StrideTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources:
+      - path: StrideTests
+    dependencies:
+      - target: Stride
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: co.nsgsolutions.StrideTests
+        GENERATE_INFOPLIST_FILE: YES
 
   StrideWatch:
     type: application

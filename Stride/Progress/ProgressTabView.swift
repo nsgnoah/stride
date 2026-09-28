@@ -39,7 +39,7 @@ struct ProgressTabView: View {
                         Text("Runs from the watch show up here.").foregroundStyle(.secondary)
                     }
                     ForEach(store.activities) { activity in
-                        ActivityRow(activity: activity)
+                        NavigationLink(value: activity) { ActivityRow(activity: activity) }
                     }
                     .onDelete { offsets in
                         for i in offsets { store.delete(store.activities[i]) }
@@ -47,6 +47,8 @@ struct ProgressTabView: View {
                 }
             }
             .navigationTitle("Progress")
+            .navigationDestination(for: ActivityRecord.self) { ActivityDetailView(activity: $0) }
+            .navigationDestination(for: Workout.self) { WorkoutDetailView(workout: $0) }
         }
     }
 

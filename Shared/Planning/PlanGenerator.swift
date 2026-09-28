@@ -68,6 +68,10 @@ struct PlanGenerator {
                 if workouts.isEmpty {
                     workouts.append(restOrMobility(weekday: weekday, schedule: schedule))
                 }
+                // Stable ids per (week, day, type) so a rebuilt plan keeps her checkmarks.
+                for i in workouts.indices {
+                    workouts[i].id = Workout.stableID("w\(index)-\(weekday.rawValue)-\(workouts[i].type.rawValue)")
+                }
                 return PlannedDay(date: date, workouts: workouts)
             }
 
@@ -129,8 +133,10 @@ struct PlanGenerator {
 
         if isRaceWeek {
             schedule[raceDay] = .race
-            let shakeout = Weekday.ordered[(raceDay.index + 6) % 7]
-            schedule[shakeout] = .shakeout
+            // Shakeout the day before, unless the race is Monday (that day is last week).
+            if raceDay.index >= 1 {
+                schedule[Weekday.ordered[raceDay.index - 1]] = .shakeout
+            }
             var easyDays = runner.runDaysPerWeek - 2
             for day in Weekday.ordered where easyDays > 0 && day.index < raceDay.index - 1 && !runner.strengthDays.contains(day) {
                 schedule[day] = .easy
@@ -143,7 +149,7 @@ struct PlanGenerator {
         let dayAfterLift = Set(lifting.map { Weekday.ordered[($0.index + 1) % 7] })
 
         // Long run: preferred day unless she lifts that day; then the nearest free day.
-        let longDay = bestDay(preferring: runner.longRunDay, avoiding: lifting.union(dayAfterLift), taken: [])
+        let longDay = bestDay(preferring: runner.longRunDay, avoidTiers: [lifting.union(dayAfterLift), lifting], taken: [])
         schedule[longDay] = .long
 
         // Quality: mid-week, at least two days from the long run, not on/after a lift.
@@ -151,7 +157,9 @@ struct PlanGenerator {
         if let quality {
             let preferred = Weekday.ordered[(longDay.index + 4) % 7]
             let buffer = Set([-1, 0, 1].map { Weekday.ordered[(longDay.index + $0 + 7) % 7] })
-            let q = bestDay(preferring: preferred, avoiding: lifting.union(dayAfterLift).union(buffer), taken: taken)
+            // Loosen constraints one at a time: first give up the long-run buffer, then the
+            // day-after-lift rule. A hard run on a lifting day itself is the last resort.
+            let q = bestDay(preferring: preferred, avoidTiers: [lifting.union(dayAfterLift).union(buffer), lifting.union(dayAfterLift), lifting], taken: taken)
             schedule[q] = quality
             taken.insert(q)
         }
@@ -172,11 +180,14 @@ struct PlanGenerator {
         return schedule
     }
 
-    private func bestDay(preferring preferred: Weekday, avoiding: Set<Weekday>, taken: Set<Weekday>) -> Weekday {
-        if !avoiding.contains(preferred), !taken.contains(preferred) { return preferred }
-        for offset in [1, -1, 2, -2, 3, -3] {
-            let d = Weekday.ordered[(preferred.index + offset + 7) % 7]
-            if !avoiding.contains(d), !taken.contains(d) { return d }
+    /// Nearest free day to `preferred`, trying each avoid-set in order (strictest first).
+    private func bestDay(preferring preferred: Weekday, avoidTiers: [Set<Weekday>], taken: Set<Weekday>) -> Weekday {
+        for avoiding in avoidTiers {
+            if !avoiding.contains(preferred), !taken.contains(preferred) { return preferred }
+            for offset in [1, -1, 2, -2, 3, -3] {
+                let d = Weekday.ordered[(preferred.index + offset + 7) % 7]
+                if !avoiding.contains(d), !taken.contains(d) { return d }
+            }
         }
         for offset in 1...6 {
             let d = Weekday.ordered[(preferred.index + offset) % 7]
