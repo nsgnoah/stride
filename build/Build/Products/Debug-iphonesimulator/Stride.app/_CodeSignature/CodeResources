@@ -4,37 +4,53 @@
 <dict>
 	<key>files</key>
 	<dict>
+		<key>AppIcon60x60@2x.png</key>
+		<data>
+		NoCEUaE+vR2ftcGHFF6Bwx1ARqE=
+		</data>
+		<key>AppIcon76x76@2x~ipad.png</key>
+		<data>
+		RQPSSTnKg+0acPLyWZg+mx6ccYE=
+		</data>
 		<key>Assets.car</key>
 		<data>
-		P7FSuKdfWTRzLgy0zx1aqmGx0kg=
+		7wOgC7t0UBdYbt5MOFbmW5R+N1I=
 		</data>
 		<key>Info.plist</key>
 		<data>
-		AagIQxRmslS1i8cSyfJ6MjRwmiU=
+		zb9CMW25vhl6SL0gkWURcEpTkQA=
 		</data>
 		<key>PkgInfo</key>
 		<data>
 		n57qDP4tZfLD1rCS43W0B4LQjzE=
 		</data>
+		<key>PrivacyInfo.xcprivacy</key>
+		<data>
+		ucg9pita0v8d353x3NuGfxweQYU=
+		</data>
 		<key>Stride.debug.dylib</key>
 		<data>
-		lwdYk7JS9ubv2IHj56/yWltAxJE=
+		9lA7FSVVjrbaSGMO6B1BNofjbTI=
 		</data>
 		<key>Watch/StrideWatch.app/Assets.car</key>
 		<data>
-		/9MrGj9MeiTnBH/N4oqdqDLSw48=
+		JTSBaKcuzUWtWRxl0iYYV4fyKr8=
 		</data>
 		<key>Watch/StrideWatch.app/Info.plist</key>
 		<data>
-		VVPC0jkzw9JOIazpU3Fb1ELXQUk=
+		xOUClKIUPH9hzntdXp80EoAeBjE=
 		</data>
 		<key>Watch/StrideWatch.app/PkgInfo</key>
 		<data>
 		n57qDP4tZfLD1rCS43W0B4LQjzE=
 		</data>
+		<key>Watch/StrideWatch.app/PrivacyInfo.xcprivacy</key>
+		<data>
+		ucg9pita0v8d353x3NuGfxweQYU=
+		</data>
 		<key>Watch/StrideWatch.app/StrideWatch</key>
 		<data>
-		ZYG18V600ITx79UVdbVDl8Tf0tM=
+		Z4srIbTN/mHzKZx4NVuE9mlxrOE=
 		</data>
 		<key>Watch/StrideWatch.app/StrideWatch.debug.dylib</key>
 		<data>
@@ -42,7 +58,7 @@
 		</data>
 		<key>Watch/StrideWatch.app/_CodeSignature/CodeResources</key>
 		<data>
-		XUDyNMTPP8Sx+xUg4lrUyst1Vys=
+		oUShSUzcrBoKM7zngC4OWYKYeJ0=
 		</data>
 		<key>Watch/StrideWatch.app/__preview.dylib</key>
 		<data>
@@ -55,32 +71,53 @@
 	</dict>
 	<key>files2</key>
 	<dict>
+		<key>AppIcon60x60@2x.png</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			M5xpEgW9UL7NyjWljO58oOj/6yWTFLL0FfQpGeyaqXs=
+			</data>
+		</dict>
+		<key>AppIcon76x76@2x~ipad.png</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			SrVLlSV1+McqBjXQaKeg/nUk4MP5s5Nnti75N0WEsIM=
+			</data>
+		</dict>
 		<key>Assets.car</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			pLxKlKkafT1XqyziJrHNnvHC/qauhh/tJn54WCCqXIY=
+			UXdrZVi4sUCH+3lLXWlBSW078qv0YdvsAeug6xfCxW8=
+			</data>
+		</dict>
+		<key>PrivacyInfo.xcprivacy</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			Uh6274Qwdz5cAQ4YOP6d2PpdYre3bRzqjX2NqtyxROI=
 			</data>
 		</dict>
 		<key>Stride.debug.dylib</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			h46+j8ZPupvOzQ34gDmXGmX+uPsnUYDRxqmJT/nWxXg=
+			UhBPij044Dwd9V5W/brPhuIodVBGJxuO07lk7uhqCC0=
 			</data>
 		</dict>
 		<key>Watch/StrideWatch.app/Assets.car</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			DjXRvrJjr+hb1qYXW+ybnPHBN3ns83pKwkCAp7NxDPg=
+			cRl+/9EttyI4zhdYJEvHddodEdxXKKgnEr6WN7Q9qBs=
 			</data>
 		</dict>
 		<key>Watch/StrideWatch.app/Info.plist</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			I0uLjragxvwFuPeXELIHu68zHwDtIYAvlU8SBnzk5FE=
+			z4Eu0SoNuMun9aJ6YdF6smFMnlipq4WUBsSPTt9l2Fo=
 			</data>
 		</dict>
 		<key>Watch/StrideWatch.app/PkgInfo</key>
@@ -90,11 +127,18 @@
 			glAhkclISwTWhTdPmHmgBmBpxJuKyuegSwHTjQfo7KA=
 			</data>
 		</dict>
+		<key>Watch/StrideWatch.app/PrivacyInfo.xcprivacy</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			Uh6274Qwdz5cAQ4YOP6d2PpdYre3bRzqjX2NqtyxROI=
+			</data>
+		</dict>
 		<key>Watch/StrideWatch.app/StrideWatch</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			nJQ6H49j2YicnwUjF+FYkO7a1RRAJWlN46GKveA0sUQ=
+			VmGcCoP5wy7YA2qph8Q2F/MHsfWlu9FDGkKuHKyYVXg=
 			</data>
 		</dict>
 		<key>Watch/StrideWatch.app/StrideWatch.debug.dylib</key>
@@ -108,7 +152,7 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			e6sgUU3wni7U7lcPgjH2CHFJfzOih9viYC+trY86eO8=
+			nkmbr4UmwN1JYVOh6TApJ4prsHgs0sXSm57nY632NkA=
 			</data>
 		</dict>
 		<key>Watch/StrideWatch.app/__preview.dylib</key>

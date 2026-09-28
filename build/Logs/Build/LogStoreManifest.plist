@@ -6,6 +6,48 @@
 	<integer>13</integer>
 	<key>logs</key>
 	<dict>
+		<key>3BB728E2-5C01-4F19-AD6D-ED0C01284C7B</key>
+		<dict>
+			<key>className</key>
+			<string>IDECommandLineBuildLog</string>
+			<key>documentTypeString</key>
+			<string>&lt;nil&gt;</string>
+			<key>domainType</key>
+			<string>Xcode.IDEActivityLogDomainType.BuildLog</string>
+			<key>fileName</key>
+			<string>3BB728E2-5C01-4F19-AD6D-ED0C01284C7B.xcactivitylog</string>
+			<key>hasPrimaryLog</key>
+			<true/>
+			<key>primaryObservable</key>
+			<dict>
+				<key>highLevelStatus</key>
+				<string>S</string>
+				<key>totalNumberOfAnalyzerIssues</key>
+				<integer>0</integer>
+				<key>totalNumberOfErrors</key>
+				<integer>0</integer>
+				<key>totalNumberOfTestFailures</key>
+				<integer>0</integer>
+				<key>totalNumberOfWarnings</key>
+				<integer>0</integer>
+			</dict>
+			<key>schemeIdentifier-containerName</key>
+			<string>Stride project</string>
+			<key>schemeIdentifier-schemeName</key>
+			<string>Stride</string>
+			<key>schemeIdentifier-sharedScheme</key>
+			<integer>1</integer>
+			<key>signature</key>
+			<string>Building project Stride with scheme Stride</string>
+			<key>timeStartedRecording</key>
+			<real>812260981.34056401</real>
+			<key>timeStoppedRecording</key>
+			<real>812260994.58106005</real>
+			<key>title</key>
+			<string>Building project Stride with scheme Stride</string>
+			<key>uniqueIdentifier</key>
+			<string>3BB728E2-5C01-4F19-AD6D-ED0C01284C7B</string>
+		</dict>
 		<key>41342432-6316-4CEF-9A81-593E6654E2A4</key>
 		<dict>
 			<key>className</key>
@@ -48,7 +90,7 @@
 			<key>uniqueIdentifier</key>
 			<string>41342432-6316-4CEF-9A81-593E6654E2A4</string>
 		</dict>
-		<key>6715C301-A5DB-4820-9514-ABAB269F9984</key>
+		<key>F89002C1-599F-4028-AC6F-3EBADF23C3FF</key>
 		<dict>
 			<key>className</key>
 			<string>IDECommandLineBuildLog</string>
@@ -57,13 +99,13 @@
 			<key>domainType</key>
 			<string>Xcode.IDEActivityLogDomainType.BuildLog</string>
 			<key>fileName</key>
-			<string>6715C301-A5DB-4820-9514-ABAB269F9984.xcactivitylog</string>
+			<string>F89002C1-599F-4028-AC6F-3EBADF23C3FF.xcactivitylog</string>
 			<key>hasPrimaryLog</key>
 			<true/>
 			<key>primaryObservable</key>
 			<dict>
 				<key>highLevelStatus</key>
-				<string>W</string>
+				<string>S</string>
 				<key>totalNumberOfAnalyzerIssues</key>
 				<integer>0</integer>
 				<key>totalNumberOfErrors</key>
@@ -71,7 +113,7 @@
 				<key>totalNumberOfTestFailures</key>
 				<integer>0</integer>
 				<key>totalNumberOfWarnings</key>
-				<integer>2</integer>
+				<integer>0</integer>
 			</dict>
 			<key>schemeIdentifier-containerName</key>
 			<string>Stride project</string>
@@ -82,13 +124,13 @@
 			<key>signature</key>
 			<string>Building project Stride with scheme Stride</string>
 			<key>timeStartedRecording</key>
-			<real>812260461.34727597</real>
+			<real>812261231.44965899</real>
 			<key>timeStoppedRecording</key>
-			<real>812260482.12731695</real>
+			<real>812261239.26463902</real>
 			<key>title</key>
 			<string>Building project Stride with scheme Stride</string>
 			<key>uniqueIdentifier</key>
-			<string>6715C301-A5DB-4820-9514-ABAB269F9984</string>
+			<string>F89002C1-599F-4028-AC6F-3EBADF23C3FF</string>
 		</dict>
 	</dict>
 </dict>

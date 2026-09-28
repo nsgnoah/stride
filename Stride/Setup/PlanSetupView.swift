@@ -95,11 +95,15 @@ struct PlanSetupView: View {
                     Text("Any recent effort works — a hard 5K, a solid 3-miler, a race. The watch uses these paces to tell you when to speed up or slow down.")
                 }
 
-                Section("Your paces") {
+                Section {
                     LabeledContent("Easy", value: preview.easy.formatted)
                     LabeledContent("Tempo", value: preview.tempo.formatted)
                     LabeledContent("Intervals", value: preview.interval.formatted)
                     LabeledContent("\(profile.goal.name) goal", value: preview.race.formatted)
+                } header: {
+                    Text("Your paces")
+                } footer: {
+                    Text("General training guidance, not medical advice. If you're new to running or have a health condition, check with a doctor first.")
                 }
             }
             .navigationTitle(isEditing ? "Adjust Plan" : "Stride")

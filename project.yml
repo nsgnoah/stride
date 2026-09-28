@@ -23,6 +23,8 @@ targets:
     sources:
       - path: Stride
       - path: Shared
+      - path: Stride/PrivacyInfo.xcprivacy
+        buildPhase: resources
     dependencies:
       - target: StrideWatch
     entitlements:
@@ -36,6 +38,7 @@ targets:
         CFBundleDisplayName: Stride
         UILaunchScreen: {}
         UISupportedInterfaceOrientations: [UIInterfaceOrientationPortrait]
+        ITSAppUsesNonExemptEncryption: false
         NSHealthShareUsageDescription: Stride reads your runs so it can chart your progress.
         NSHealthUpdateUsageDescription: Stride saves runs you record from your watch to Health.
         WKCompanionAppBundleIdentifier: co.nsgsolutions.Stride
@@ -50,6 +53,8 @@ targets:
     sources:
       - path: StrideWatch
       - path: Shared
+      - path: StrideWatch/PrivacyInfo.xcprivacy
+        buildPhase: resources
     entitlements:
       path: StrideWatch/StrideWatch.entitlements
       properties:
@@ -63,6 +68,7 @@ targets:
         WKCompanionAppBundleIdentifier: co.nsgsolutions.Stride
         WKRunsIndependentlyOfCompanionApp: true
         WKBackgroundModes: [workout-processing]
+        ITSAppUsesNonExemptEncryption: false
         NSHealthShareUsageDescription: Stride reads heart rate and distance during your run to coach your pace.
         NSHealthUpdateUsageDescription: Stride saves your runs as workouts in Health.
         NSLocationWhenInUseUsageDescription: Stride uses GPS to measure your distance and pace while you run.

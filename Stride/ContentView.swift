@@ -88,6 +88,12 @@ struct SettingsView: View {
                     Button("Sync plan to watch") { Connectivity.shared.send(plan: store.plan) }
                     Button("Start over", role: .destructive) { showReset = true }
                 }
+                Section("About") {
+                    Text("Your plan and runs are stored only on your iPhone and Apple Watch. Runs you save are written to Apple Health on your device. Stride has no account, no server, and no analytics.")
+                        .font(.footnote).foregroundStyle(.secondary)
+                    Text("Stride offers general training guidance and is not medical advice. Check with a doctor before starting a new training program, and stop if you feel pain.")
+                        .font(.footnote).foregroundStyle(.secondary)
+                }
             }
             .navigationTitle("Settings")
             .confirmationDialog("Delete the plan and all logged runs?", isPresented: $showReset, titleVisibility: .visible) {

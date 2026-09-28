@@ -6,15 +6,19 @@
 	<dict>
 		<key>Assets.car</key>
 		<data>
-		/9MrGj9MeiTnBH/N4oqdqDLSw48=
+		JTSBaKcuzUWtWRxl0iYYV4fyKr8=
 		</data>
 		<key>Info.plist</key>
 		<data>
-		VVPC0jkzw9JOIazpU3Fb1ELXQUk=
+		xOUClKIUPH9hzntdXp80EoAeBjE=
 		</data>
 		<key>PkgInfo</key>
 		<data>
 		n57qDP4tZfLD1rCS43W0B4LQjzE=
+		</data>
+		<key>PrivacyInfo.xcprivacy</key>
+		<data>
+		ucg9pita0v8d353x3NuGfxweQYU=
 		</data>
 		<key>StrideWatch.debug.dylib</key>
 		<data>
@@ -31,7 +35,14 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			DjXRvrJjr+hb1qYXW+ybnPHBN3ns83pKwkCAp7NxDPg=
+			cRl+/9EttyI4zhdYJEvHddodEdxXKKgnEr6WN7Q9qBs=
+			</data>
+		</dict>
+		<key>PrivacyInfo.xcprivacy</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			Uh6274Qwdz5cAQ4YOP6d2PpdYre3bRzqjX2NqtyxROI=
 			</data>
 		</dict>
 		<key>StrideWatch.debug.dylib</key>
