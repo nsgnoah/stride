@@ -1,6 +1,6 @@
 # Apple App Store audit — Stride
 
-- **Date:** 2026-09-27
+- **Date:** 2026-09-27, refreshed 2026-09-28 after adding widgets, reminders, and Health import
 - **Project:** Stride (`co.nsgsolutions.Stride`) — iPhone app + watchOS app (`co.nsgsolutions.Stride.watchkitapp`), native SwiftUI, XcodeGen project, Xcode 27.0, deployment targets iOS 18 / watchOS 11.
 - **Live Apple sources checked:** yes — [Upcoming requirements](https://developer.apple.com/news/upcoming-requirements/) and the [Review Guidelines](https://developer.apple.com/app-store/review/guidelines/) were fetched on the audit date. Relevant items: Xcode 26+/iOS 26 SDK required for uploads since April 28 2026 (met: Xcode 27); updated age-rating questionnaire required since Jan 31 2026 (manual, below); required-reason API declarations (met: none used).
 
@@ -13,6 +13,9 @@
 | 3 | Build / 2.3 | The App Icon sets had no image at all (upload would fail). Generated a 1024×1024 opaque icon for iPhone and Watch. **It's a placeholder-quality mark — swap in real art before shipping.** | `Stride/Assets.xcassets/AppIcon.appiconset`, `StrideWatch/Assets.xcassets/AppIcon.appiconset` |
 | 4 | 1.4.1 (health guidance) | Added a plain-language "not medical advice, check with a doctor" note in plan setup and Settings › About. | `Stride/Setup/PlanSetupView.swift`, `Stride/ContentView.swift` |
 | 5 | 5.1.1(i) (privacy disclosure) | Added an in-app privacy statement in Settings › About: no account, no server, no analytics; runs saved to Health on-device. | `Stride/ContentView.swift` |
+| 7 | 5.1.1 (HealthKit read on iPhone) | The iPhone's `NSHealthShareUsageDescription` is now backed by a real feature (Progress › Import runs from Health). Access is requested only from that button, never at launch; the foreground auto-import runs silently and returns nothing until she has granted it. | `Stride/HealthImporter.swift` |
+| 8 | 5.1.1(ii) / 4.5.4 (notifications) | Morning reminders are opt-in from Settings, local only, and requested in context (no purpose string is required for `UNUserNotificationCenter`). Denial is handled with a pointer to iOS Settings. | `Stride/Reminders.swift`, `Stride/ContentView.swift` |
+| 9 | Privacy manifest coverage | Widget extensions (iOS + watchOS) read the plan from the app group and use no required-reason APIs or tracking; they're covered by the app's manifest. App Group entitlement added to all four targets. | `project.yml` |
 | 6 | 2.5.4 (crash on start) | Fixed a watchOS assertion crash when starting a run (`allowsBackgroundLocationUpdates` without a location background mode). Found during simulator testing, fixed in the previous commit. | `StrideWatch/WorkoutManager.swift` |
 
 ## Needs your decision
@@ -64,15 +67,15 @@
 | Placeholder / debug copy | Pass | Scanner found none; no "beta/test/TODO" strings in UI |
 | Other-platform references | Pass | None |
 | Minimum functionality | Pass | Native plan generator, charts, live watch coaching |
-| Push notifications | N/A | None |
+| Push notifications | N/A | Local reminders only, opt-in; no remote push |
 | Apple trademarks | Pass | SF Symbols only |
 | Private APIs | Pass | None |
 | Downloaded code | N/A | None |
-| Background modes | Pass | Watch: `workout-processing` only, backed by a real `HKWorkoutSession`. iPhone: none |
+| Background modes | Pass | Watch: `workout-processing` only, backed by a real `HKWorkoutSession`. iPhone: none (widgets and Health import run in the foreground / WidgetKit's schedule) |
 | ATS | Pass | No network calls at all; no `NSAllowsArbitraryLoads` |
 | Deprecated APIs (`UIWebView`, etc.) | Pass | None |
 | Offline / permission-denied behaviour | Pass | Fully offline app |
-| Entitlements match usage | Pass | HealthKit only, used on both targets |
+| Entitlements match usage | Pass | HealthKit (both apps), App Group (apps + widgets) — all used |
 | iPad | N/A | `TARGETED_DEVICE_FAMILY = 1` (iPhone only) |
 | Orientations | Pass | Portrait only, matches UI |
 | Dark mode | Pass | System colors throughout |

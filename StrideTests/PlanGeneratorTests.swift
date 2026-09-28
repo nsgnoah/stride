@@ -215,6 +215,65 @@ struct PlanGeneratorTests {
     }
 }
 
+struct PlanEditingTests {
+    @Test func movingOntoALiftDaySharesIt() {
+        var plan = PlanGeneratorTests.plan(PlanGeneratorTests.profile(lifts: [.monday, .thursday]))
+        let week = plan.weeks[1]
+        let run = week.days.first { $0.workouts.contains { $0.type.isRun } }!.workouts.first { $0.type.isRun }!
+        let monday = week.days[0]
+        #expect(monday.workouts.contains { $0.type == .strength })
+        plan.move(workoutID: run.id, to: monday.date)
+        let after = plan.weeks[1].days[0].workouts
+        #expect(after.contains { $0.type == .strength })
+        #expect(after.contains { $0.id == run.id })
+    }
+
+    @Test func movingToAnUnknownDateIsANoOp() {
+        var plan = PlanGeneratorTests.plan(PlanGeneratorTests.profile())
+        let before = plan
+        let run = plan.allDays.flatMap(\.workouts).first { $0.type.isRun }!
+        plan.move(workoutID: run.id, to: Date.distantFuture)
+        // The run is lifted out and can't land anywhere, so nothing should change.
+        #expect(plan.allDays.flatMap(\.workouts).count == before.allDays.flatMap(\.workouts).count)
+    }
+
+    @Test func skippedRunsAreNotMissedOrNext() throws {
+        // Snapshot round-trip keeps skips; that's what the watch relies on.
+        var plan = PlanGeneratorTests.plan(PlanGeneratorTests.profile())
+        let run = plan.allDays.flatMap(\.workouts).first { $0.type.isRun }!
+        plan.skipped.insert(run.id)
+        let data = try JSONEncoder().encode(plan)
+        let back = try JSONDecoder().decode(TrainingPlan.self, from: data)
+        #expect(back.isSkipped(run))
+    }
+}
+
+struct RecalibrationTests {
+    static func record(_ type: WorkoutType, miles: Double, minutes: Double, daysAgo: Int) -> ActivityRecord {
+        ActivityRecord(date: Date.now.addingTimeInterval(-Double(daysAgo) * 86400), type: type, durationSeconds: minutes * 60, meters: Units.meters(miles: miles))
+    }
+
+    @Test func prefersHardEffortsOverLongRuns() {
+        let acts = [
+            Self.record(.long, miles: 8, minutes: 88, daysAgo: 3),   // faster-equivalent, but a long run
+            Self.record(.tempo, miles: 3, minutes: 27, daysAgo: 10),
+            Self.record(.easy, miles: 3, minutes: 24, daysAgo: 1),   // fast easy run, must be ignored
+        ]
+        let best = PaceCalculator.bestRecentEffort(in: acts)
+        #expect(best?.type == .tempo)
+    }
+
+    @Test func fallsBackToLongRunsAndIgnoresOldOrShortOnes() {
+        let acts = [
+            Self.record(.long, miles: 6, minutes: 66, daysAgo: 5),
+            Self.record(.race, miles: 6.2, minutes: 50, daysAgo: 60), // too old
+            Self.record(.tempo, miles: 0.5, minutes: 4, daysAgo: 2),  // too short
+        ]
+        #expect(PaceCalculator.bestRecentEffort(in: acts)?.type == .long)
+        #expect(PaceCalculator.bestRecentEffort(in: []) == nil)
+    }
+}
+
 struct PaceCalculatorTests {
     @Test func zonesAreOrdered() {
         var p = RunnerProfile()

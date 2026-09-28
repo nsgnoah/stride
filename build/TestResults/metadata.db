@@ -13,12 +13,30 @@
 				<key>riegelPredictsSlowerPaceForLongerRaces</key>
 				<dict>
 					<key>mrnet</key>
-					<real>1.5020370483398438e-05</real>
+					<real>1.4066696166992188e-05</real>
 				</dict>
 				<key>zonesAreOrdered</key>
 				<dict>
 					<key>mrnet</key>
-					<real>1.9788742065429688e-05</real>
+					<real>3.6001205444335938e-05</real>
+				</dict>
+			</dict>
+			<key>PlanEditingTests</key>
+			<dict>
+				<key>movingOntoALiftDaySharesIt</key>
+				<dict>
+					<key>mrnet</key>
+					<real>0.00070309638977050781</real>
+				</dict>
+				<key>movingToAnUnknownDateIsANoOp</key>
+				<dict>
+					<key>mrnet</key>
+					<real>0.00092077255249023438</real>
+				</dict>
+				<key>skippedRunsAreNotMissedOrNext</key>
+				<dict>
+					<key>mrnet</key>
+					<real>0.0033290386199951172</real>
 				</dict>
 			</dict>
 			<key>PlanGeneratorTests</key>
@@ -26,87 +44,100 @@
 				<key>everyRunHasWarmupAndCooldownRoutines</key>
 				<dict>
 					<key>mrnet</key>
-					<real>0.00088095664978027344</real>
+					<real>0.00085616111755371094</real>
 				</dict>
 				<key>firstTwoWeeksAreAllEasy</key>
 				<dict>
 					<key>mrnet</key>
-					<real>0.046916961669921875</real>
+					<real>0.046425342559814453</real>
 				</dict>
 				<key>hardRunsAvoidLiftingDays</key>
 				<dict>
 					<key>mrnet</key>
-					<real>0.036202907562255859</real>
+					<real>0.037269115447998047</real>
 				</dict>
 				<key>longRunNeverExceedsTheGoalCap</key>
 				<dict>
 					<key>mrnet</key>
-					<real>0.048064231872558594</real>
+					<real>0.049805879592895508</real>
 				</dict>
 				<key>mobilityLandsAfterLongRun</key>
 				<dict>
 					<key>mrnet</key>
-					<real>0.00061178207397460938</real>
+					<real>0.00063920021057128906</real>
 				</dict>
 				<key>mondayRaceHasNoShakeoutAfterTheRace</key>
 				<dict>
 					<key>mrnet</key>
-					<real>0.00067973136901855469</real>
+					<real>0.00071811676025390625</real>
 				</dict>
 				<key>moveAndSkipRoundTrip</key>
 				<dict>
 					<key>mrnet</key>
-					<real>0.00069499015808105469</real>
+					<real>0.0006809234619140625</real>
 				</dict>
 				<key>noHardRunTheDayAfterALift</key>
 				<dict>
 					<key>mrnet</key>
-					<real>0.025262117385864258</real>
+					<real>0.025429964065551758</real>
 				</dict>
 				<key>plansRoundTripThroughJSON</key>
 				<dict>
 					<key>mrnet</key>
-					<real>0.0033717155456542969</real>
+					<real>0.0034017562866210938</real>
 				</dict>
 				<key>raceWeekIsLighterThanTheWeekBefore</key>
 				<dict>
 					<key>mrnet</key>
-					<real>0.036711931228637695</real>
+					<real>0.036897897720336914</real>
 				</dict>
 				<key>raceWeekIsTheLastWeek</key>
 				<dict>
 					<key>mrnet</key>
-					<real>0.0011899471282958984</real>
+					<real>0.0012900829315185547</real>
 				</dict>
 				<key>rebuildingKeepsWorkoutIDs</key>
 				<dict>
 					<key>mrnet</key>
-					<real>0.0013158321380615234</real>
+					<real>0.0012710094451904297</real>
 				</dict>
 				<key>runsPerWeekMatchesTheProfile</key>
 				<dict>
 					<key>mrnet</key>
-					<real>0.049330949783325195</real>
+					<real>0.050726890563964844</real>
 				</dict>
 				<key>startingMidweekKeepsCurrentWeek</key>
 				<dict>
 					<key>mrnet</key>
-					<real>3.2186508178710938e-05</real>
+					<real>2.6941299438476562e-05</real>
 				</dict>
 				<key>startingOnSundayBeginsNextMonday</key>
 				<dict>
 					<key>mrnet</key>
-					<real>0.00068688392639160156</real>
+					<real>0.0013108253479003906</real>
 				</dict>
 				<key>volumeNeverJumpsMoreThanFifteenPercentAboveThePriorPeak</key>
 				<dict>
 					<key>mrnet</key>
-					<real>0.047468185424804688</real>
+					<real>0.048784255981445312</real>
 				</dict>
 				<key>volumeNeverJumpsMoreThanFifteenPercentWeekToWeek</key>
 				<dict>
 					<key>mrnet</key>
 					<real>0.054719924926757812</real>
+				</dict>
+			</dict>
+			<key>RecalibrationTests</key>
+			<dict>
+				<key>fallsBackToLongRunsAndIgnoresOldOrShortOnes</key>
+				<dict>
+					<key>mrnet</key>
+					<real>2.09808349609375e-05</real>
+				</dict>
+				<key>prefersHardEffortsOverLongRuns</key>
+				<dict>
+					<key>mrnet</key>
+					<real>2.8848648071289062e-05</real>
 				</dict>
 			</dict>
 		</dict>
