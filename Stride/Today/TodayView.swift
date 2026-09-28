@@ -222,7 +222,8 @@ struct WorkoutDetailView: View {
                 ToolbarItem(placement: .primaryAction) {
                     Menu {
                         Button("Move to another day…", systemImage: "calendar") {
-                            moveDate = store.plan?.allDays.first { $0.workouts.contains { $0.id == workout.id } }?.date ?? .now
+                            let current = store.plan?.date(of: workout.id) ?? .now
+                            moveDate = planDateRange.map { min(max(current, $0.lowerBound), $0.upperBound) } ?? current
                             moving = true
                         }
                         if isSkipped {
@@ -237,7 +238,7 @@ struct WorkoutDetailView: View {
             }
         }
         .sheet(isPresented: $loggingManually) {
-            LogActivityView(prefill: workout, date: store.plan?.allDays.first { $0.workouts.contains { $0.id == workout.id } }?.date)
+            LogActivityView(prefill: workout, date: store.plan?.date(of: workout.id))
         }
         .sheet(isPresented: $moving) {
             NavigationStack {

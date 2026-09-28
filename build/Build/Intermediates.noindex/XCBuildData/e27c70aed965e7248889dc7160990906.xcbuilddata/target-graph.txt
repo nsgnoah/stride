@@ -1,8 +1,0 @@
-Target dependency graph (4 targets)
-Target 'StrideTests' in project 'Stride'
-➜ Explicit dependency on target 'Stride' in project 'Stride'
-Target 'Stride' in project 'Stride'
-➜ Explicit dependency on target 'StrideWatch' in project 'Stride'
-➜ Explicit dependency on target 'StrideWidget' in project 'Stride'
-Target 'StrideWidget' in project 'Stride' (no dependencies)
-Target 'StrideWatch' in project 'Stride' (no dependencies)

@@ -17,7 +17,11 @@ struct StrideApp: App {
                     // Pick up runs she logged elsewhere whenever the app comes forward.
                     // Only after she has granted access once (from Progress), never a cold prompt.
                     if phase == .active, store.plan != nil {
-                        Task { await HealthImporter.importRuns(into: store) }
+                        Task {
+                            await HealthImporter.importRuns(into: store)
+                            // Keeps the two-week reminder window rolling even in a quiet stretch.
+                            await Reminders.reschedule(plan: store.plan, hour: store.reminderHour, skippedOrDone: store.settledWorkoutIDs)
+                        }
                     }
                 }
                 .onChange(of: store.plan) { _, plan in

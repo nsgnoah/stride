@@ -11,8 +11,12 @@ final class AppStore {
     var plan: TrainingPlan?
     var activities: [ActivityRecord] = []
     /// Hour of the morning reminder on run days; nil when reminders are off.
-    var reminderHour: Int? {
-        didSet { save() }
+    /// Set via `setReminderHour` so loading a snapshot never triggers a save.
+    private(set) var reminderHour: Int?
+
+    func setReminderHour(_ hour: Int?) {
+        reminderHour = hour
+        save()
     }
 
     private let url: URL
@@ -50,12 +54,17 @@ final class AppStore {
 
     // MARK: - Mutations
 
-    func createPlan(from profile: RunnerProfile) {
+    /// Builds (or rebuilds) the plan. A rebuild keeps the original start so week numbers
+    /// and finished workouts line up, and re-applies her skips and moved days.
+    /// `fresh` starts over from today (the next goal after a finished plan).
+    func createPlan(from profile: RunnerProfile, fresh: Bool = false) {
         self.profile = profile
-        // Rebuilding keeps the original start so week numbers and finished workouts line up.
-        let start = plan?.startDate ?? .now
-        var newPlan = PlanGenerator(runner: profile, startDate: start).makePlan()
-        newPlan.skipped = plan?.skipped ?? []
+        let previous = fresh ? nil : plan
+        var newPlan = PlanGenerator(runner: profile, startDate: previous?.startDate ?? .now).makePlan()
+        if let previous {
+            newPlan.skipped = previous.skipped
+            for (id, date) in previous.moves { newPlan.move(workoutID: id, to: date) }
+        }
         plan = newPlan
         save()
     }

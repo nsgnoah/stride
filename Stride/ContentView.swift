@@ -91,14 +91,14 @@ struct SettingsView: View {
                             if on {
                                 Task {
                                     if await Reminders.requestPermission() {
-                                        store.reminderHour = 7
+                                        store.setReminderHour(7)
                                         await Reminders.reschedule(plan: store.plan, hour: 7, skippedOrDone: store.settledWorkoutIDs)
                                     } else {
                                         remindersDenied = true
                                     }
                                 }
                             } else {
-                                store.reminderHour = nil
+                                store.setReminderHour(nil)
                                 Task { await Reminders.reschedule(plan: nil, hour: nil, skippedOrDone: []) }
                             }
                         }
@@ -107,7 +107,7 @@ struct SettingsView: View {
                         Picker("Time", selection: Binding(
                             get: { hour },
                             set: { h in
-                                store.reminderHour = h
+                                store.setReminderHour(h)
                                 Task { await Reminders.reschedule(plan: store.plan, hour: h, skippedOrDone: store.settledWorkoutIDs) }
                             }
                         )) {

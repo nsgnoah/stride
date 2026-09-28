@@ -119,8 +119,7 @@ struct PlanSetupView: View {
                 }
                 ToolbarItem(placement: .confirmationAction) {
                     Button(isEditing ? "Rebuild" : "Build my plan") {
-                        if startFresh { store.plan = nil }
-                        store.createPlan(from: builtProfile)
+                        store.createPlan(from: builtProfile, fresh: startFresh)
                         dismiss()
                     }
                     .bold()

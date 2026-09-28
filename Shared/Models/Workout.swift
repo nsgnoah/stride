@@ -145,6 +145,11 @@ struct Segment: Codable, Hashable, Identifiable, Sendable {
 struct Workout: Codable, Hashable, Identifiable, Sendable {
     var id: UUID = UUID()
 
+    /// The placeholder every empty day carries, so a day is never an empty list.
+    static var rest: Workout {
+        Workout(type: .rest, title: "Rest", summary: "Recovery is training. Walk, sleep, eat well.")
+    }
+
     /// A deterministic id for a slot in the plan, so rebuilding the plan (new paces, a
     /// tweaked schedule) keeps completed workouts matched to their records.
     static func stableID(_ key: String) -> UUID {
@@ -220,8 +225,10 @@ struct TrainingPlan: Codable, Hashable, Identifiable, Sendable {
     var paces: PaceProfile
     /// Workouts she chose to skip. Lives on the plan so it syncs to the watch with it.
     var skipped: Set<UUID> = []
+    /// Workouts she moved, by id → the day they now live on. Re-applied when the plan is rebuilt.
+    var moves: [UUID: Date] = [:]
 
-    init(id: UUID = UUID(), createdAt: Date, goal: GoalDistance, raceDate: Date, weeks: [PlannedWeek], paces: PaceProfile, skipped: Set<UUID> = []) {
+    init(id: UUID = UUID(), createdAt: Date, goal: GoalDistance, raceDate: Date, weeks: [PlannedWeek], paces: PaceProfile, skipped: Set<UUID> = [], moves: [UUID: Date] = [:]) {
         self.id = id
         self.createdAt = createdAt
         self.goal = goal
@@ -229,9 +236,10 @@ struct TrainingPlan: Codable, Hashable, Identifiable, Sendable {
         self.weeks = weeks
         self.paces = paces
         self.skipped = skipped
+        self.moves = moves
     }
 
-    private enum CodingKeys: String, CodingKey { case id, createdAt, goal, raceDate, weeks, paces, skipped }
+    private enum CodingKeys: String, CodingKey { case id, createdAt, goal, raceDate, weeks, paces, skipped, moves }
 
     init(from decoder: Decoder) throws {
         let c = try decoder.container(keyedBy: CodingKeys.self)
@@ -242,6 +250,7 @@ struct TrainingPlan: Codable, Hashable, Identifiable, Sendable {
         weeks = try c.decode([PlannedWeek].self, forKey: .weeks)
         paces = try c.decode(PaceProfile.self, forKey: .paces)
         skipped = try c.decodeIfPresent(Set<UUID>.self, forKey: .skipped) ?? []
+        moves = try c.decodeIfPresent([UUID: Date].self, forKey: .moves) ?? [:]
     }
 
     var allDays: [PlannedDay] { weeks.flatMap(\.days) }
@@ -250,29 +259,37 @@ struct TrainingPlan: Codable, Hashable, Identifiable, Sendable {
 
     func isSkipped(_ workout: Workout) -> Bool { skipped.contains(workout.id) }
 
+    /// The day a workout currently sits on.
+    func date(of workoutID: UUID) -> Date? {
+        allDays.first { $0.workouts.contains { $0.id == workoutID } }?.date
+    }
+
     /// Moves a workout to another day inside the plan. A rest placeholder on the target day
-    /// gives way; anything else (a lift, another run) shares the day.
+    /// gives way; anything else (a lift, another run) shares the day. Nothing changes if the
+    /// target day isn't part of the plan.
     mutating func move(workoutID: UUID, to date: Date, calendar: Calendar = .current) {
-        var moved: Workout?
+        // Find both ends before touching anything, so a bad target can't lose the workout.
+        var source: (w: Int, d: Int, i: Int)?
+        var target: (w: Int, d: Int)?
         for w in weeks.indices {
             for d in weeks[w].days.indices {
-                if let i = weeks[w].days[d].workouts.firstIndex(where: { $0.id == workoutID }) {
-                    moved = weeks[w].days[d].workouts.remove(at: i)
-                    if weeks[w].days[d].workouts.isEmpty {
-                        weeks[w].days[d].workouts = [Workout(type: .rest, title: "Rest", summary: "Recovery is training. Walk, sleep, eat well.")]
-                    }
+                if source == nil, let i = weeks[w].days[d].workouts.firstIndex(where: { $0.id == workoutID }) {
+                    source = (w, d, i)
+                }
+                if target == nil, calendar.isDate(weeks[w].days[d].date, inSameDayAs: date) {
+                    target = (w, d)
                 }
             }
         }
-        guard let moved else { return }
-        for w in weeks.indices {
-            for d in weeks[w].days.indices where calendar.isDate(weeks[w].days[d].date, inSameDayAs: date) {
-                weeks[w].days[d].workouts.removeAll { $0.type == .rest }
-                weeks[w].days[d].workouts.append(moved)
-                skipped.remove(workoutID)
-                return
-            }
+        guard let source, let target else { return }
+        let moved = weeks[source.w].days[source.d].workouts.remove(at: source.i)
+        if weeks[source.w].days[source.d].workouts.isEmpty {
+            weeks[source.w].days[source.d].workouts = [.rest]
         }
+        weeks[target.w].days[target.d].workouts.removeAll { $0.type == .rest }
+        weeks[target.w].days[target.d].workouts.append(moved)
+        skipped.remove(workoutID)
+        moves[workoutID] = weeks[target.w].days[target.d].date
     }
 
     func day(on date: Date, calendar: Calendar = .current) -> PlannedDay? {

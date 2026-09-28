@@ -233,18 +233,47 @@ struct PlanEditingTests {
         let before = plan
         let run = plan.allDays.flatMap(\.workouts).first { $0.type.isRun }!
         plan.move(workoutID: run.id, to: Date.distantFuture)
-        // The run is lifted out and can't land anywhere, so nothing should change.
-        #expect(plan.allDays.flatMap(\.workouts).count == before.allDays.flatMap(\.workouts).count)
+        #expect(plan == before)
+        #expect(plan.date(of: run.id) == before.date(of: run.id))
     }
 
-    @Test func skippedRunsAreNotMissedOrNext() throws {
-        // Snapshot round-trip keeps skips; that's what the watch relies on.
+    @Test func movesAreRememberedAndSurviveARebuild() {
+        var plan = PlanGeneratorTests.plan(PlanGeneratorTests.profile())
+        let run = plan.weeks[1].days[1].workouts.first { $0.type.isRun }!
+        let sunday = plan.weeks[1].days[6].date
+        plan.move(workoutID: run.id, to: sunday)
+        #expect(plan.moves[run.id] == sunday)
+
+        // A rebuild with new paces regenerates every slot, then re-applies the move.
+        var rebuilt = PlanGeneratorTests.plan(PlanGeneratorTests.profile())
+        for (id, date) in plan.moves { rebuilt.move(workoutID: id, to: date) }
+        #expect(PlanGeneratorTests.calendar.isDate(rebuilt.date(of: run.id)!, inSameDayAs: sunday))
+    }
+
+    @Test func skipsAndMovesRoundTripThroughJSON() throws {
+        // Snapshot round-trip keeps skips and moves; that's what the watch relies on.
         var plan = PlanGeneratorTests.plan(PlanGeneratorTests.profile())
         let run = plan.allDays.flatMap(\.workouts).first { $0.type.isRun }!
         plan.skipped.insert(run.id)
         let data = try JSONEncoder().encode(plan)
         let back = try JSONDecoder().decode(TrainingPlan.self, from: data)
         #expect(back.isSkipped(run))
+        #expect(back == plan)
+    }
+
+    @Test @MainActor func skippedRunsAreNeitherMissedNorNext() {
+        let store = AppStore(filename: "stride-test-\(UUID().uuidString).json")
+        defer { store.reset() }
+        var profile = PlanGeneratorTests.profile()
+        profile.raceDate = Calendar.current.date(byAdding: .weekOfYear, value: 10, to: .now)!
+        store.createPlan(from: profile)
+        // Pretend the plan started two weeks ago so there are runs in the past.
+        var plan = PlanGenerator(runner: profile, startDate: Calendar.current.date(byAdding: .day, value: -14, to: .now)!).makePlan()
+        let pastRun = plan.allDays.first { $0.date < Calendar.current.startOfDay(for: .now) && $0.workouts.contains { $0.type.isRun } }!.workouts.first { $0.type.isRun }!
+        plan.skipped.insert(pastRun.id)
+        store.replacePlan(plan)
+        #expect(!store.missedRuns.contains { $0.workout.id == pastRun.id })
+        #expect(store.nextRun?.workout.id != pastRun.id)
     }
 }
 

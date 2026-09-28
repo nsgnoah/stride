@@ -218,7 +218,7 @@ struct PlanGenerator {
         if let routine {
             return Workout(type: .mobility, title: routine.title, summary: routine.purpose, standaloneRoutineID: routine.id)
         }
-        return Workout(type: .rest, title: "Rest", summary: "Recovery is training. Walk, sleep, eat well.")
+        return .rest
     }
 
     private func workout(type: WorkoutType, weekMiles: Double, paces: PaceProfile, weekIndex: Int, totalWeeks: Int, quality: WorkoutType?, isTaper: Bool, isRaceWeek: Bool = false) -> Workout {

@@ -291,9 +291,13 @@ final class WorkoutManager: NSObject {
         }
     }
 
-    /// Under 3 m covered in the last 8 s (after the first 20 s) → pause. Location updates resume it.
+    /// Under 3 m covered in the last 8 s → pause. Only while a segment expects her to be
+    /// running (not during standing warm-up drills or the cool-down stretch), and not in the
+    /// first 20 s after a start or resume, when distance sources are still catching up.
     private func autoPauseIfStationary() {
-        guard autoPauseEnabled, elapsed > 20, let last = samples.last else { return }
+        guard autoPauseEnabled, let segment, segment.kind == .work || segment.kind == .recovery,
+              let resumedAt, Date.now.timeIntervalSince(resumedAt) > 20,
+              let last = samples.last else { return }
         let cutoff = Date.now.addingTimeInterval(-8)
         guard let ref = samples.first(where: { $0.time >= cutoff }),
               last.time.timeIntervalSince(ref.time) >= 6 else { return }

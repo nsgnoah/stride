@@ -20,11 +20,20 @@ enum HealthImporter {
         }
     }
 
+    private static var importing = false
+
     /// Imports new running workouts since the plan started. Returns how many were added.
     @discardableResult
     static func importRuns(into appStore: AppStore) async -> Int {
-        guard isAvailable, let plan = appStore.plan, let start = plan.startDate else { return 0 }
-        let known = Set(appStore.activities.compactMap(\.healthKitID))
+        guard isAvailable, let plan = appStore.plan, let planStart = plan.startDate else { return 0 }
+        // The permission sheet flips scenePhase, which can start a second import mid-flight.
+        guard !importing else { return 0 }
+        importing = true
+        defer { importing = false }
+
+        // Only look back as far as needed: a day before the newest import, or the plan start.
+        let newestImport = appStore.activities.filter { $0.healthKitID != nil }.map(\.date).max()
+        let start = newestImport.map { max(planStart, $0.addingTimeInterval(-86400)) } ?? planStart
 
         let predicate = HKQuery.predicateForSamples(withStart: start, end: .now, options: [])
         let running = HKQuery.predicateForWorkouts(with: .running)
@@ -42,7 +51,7 @@ enum HealthImporter {
         for w in workouts {
             // Stride's own watch recordings already arrive via WatchConnectivity.
             if w.sourceRevision.source.bundleIdentifier.hasPrefix("co.nsgsolutions.Stride") { continue }
-            if known.contains(w.uuid) { continue }
+            if appStore.activities.contains(where: { $0.healthKitID == w.uuid }) { continue }
             let meters = w.statistics(for: HKQuantityType(.distanceWalkingRunning))?.sumQuantity()?.doubleValue(for: .meter()) ?? 0
             guard w.duration > 60 else { continue }
             let hr = w.statistics(for: HKQuantityType(.heartRate))?.averageQuantity()?.doubleValue(for: HKUnit.count().unitDivided(by: .minute()))
