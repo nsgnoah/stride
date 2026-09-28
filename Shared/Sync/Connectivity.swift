@@ -43,7 +43,17 @@ final class Connectivity: NSObject, WCSessionDelegate, @unchecked Sendable {
     func send(activity: ActivityRecord) {
         guard WCSession.isSupported(), WCSession.default.activationState == .activated else { return }
         guard let data = try? JSONEncoder().encode(activity) else { return }
-        WCSession.default.transferUserInfo([Key.activity: data])
+        let payload = [Key.activity: data]
+        let session = WCSession.default
+        // Phone nearby and awake: deliver now so the checkmark appears while she's still
+        // looking at it. Otherwise (or if that fails) queue it for whenever they reconnect.
+        if session.isReachable {
+            session.sendMessage(payload, replyHandler: nil) { _ in
+                session.transferUserInfo(payload)
+            }
+        } else {
+            session.transferUserInfo(payload)
+        }
     }
 
     // MARK: - Receiving
@@ -57,7 +67,15 @@ final class Connectivity: NSObject, WCSessionDelegate, @unchecked Sendable {
     }
 
     func session(_ session: WCSession, didReceiveUserInfo userInfo: [String: Any] = [:]) {
-        guard let data = userInfo[Key.activity] as? Data,
+        receive(userInfo)
+    }
+
+    func session(_ session: WCSession, didReceiveMessage message: [String: Any]) {
+        receive(message)
+    }
+
+    private func receive(_ payload: [String: Any]) {
+        guard let data = payload[Key.activity] as? Data,
               let activity = try? JSONDecoder().decode(ActivityRecord.self, from: data) else { return }
         Task { @MainActor in store?.record(activity) }
     }

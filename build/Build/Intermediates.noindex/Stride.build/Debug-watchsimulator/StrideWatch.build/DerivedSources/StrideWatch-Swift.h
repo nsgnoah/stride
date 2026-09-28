@@ -393,6 +393,7 @@ SWIFT_CLASS("_TtC11StrideWatch12Connectivity")
 + (nonnull instancetype)new SWIFT_UNAVAILABLE_MSG("-init is unavailable");
 - (void)session:(WCSession * _Nonnull)session didReceiveApplicationContext:(NSDictionary<NSString *, id> * _Nonnull)applicationContext;
 - (void)session:(WCSession * _Nonnull)session didReceiveUserInfo:(NSDictionary<NSString *, id> * _Nonnull)userInfo;
+- (void)session:(WCSession * _Nonnull)session didReceiveMessage:(NSDictionary<NSString *, id> * _Nonnull)message;
 - (void)session:(WCSession * _Nonnull)session activationDidCompleteWithState:(WCSessionActivationState)activationState error:(NSError * _Nullable)error;
 @end
 
@@ -828,6 +829,7 @@ SWIFT_CLASS("_TtC11StrideWatch12Connectivity")
 + (nonnull instancetype)new SWIFT_UNAVAILABLE_MSG("-init is unavailable");
 - (void)session:(WCSession * _Nonnull)session didReceiveApplicationContext:(NSDictionary<NSString *, id> * _Nonnull)applicationContext;
 - (void)session:(WCSession * _Nonnull)session didReceiveUserInfo:(NSDictionary<NSString *, id> * _Nonnull)userInfo;
+- (void)session:(WCSession * _Nonnull)session didReceiveMessage:(NSDictionary<NSString *, id> * _Nonnull)message;
 - (void)session:(WCSession * _Nonnull)session activationDidCompleteWithState:(WCSessionActivationState)activationState error:(NSError * _Nullable)error;
 @end
 
