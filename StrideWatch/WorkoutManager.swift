@@ -122,7 +122,8 @@ final class WorkoutManager: NSObject {
         locationManager.delegate = self
         locationManager.desiredAccuracy = kCLLocationAccuracyBest
         locationManager.activityType = .fitness
-        locationManager.allowsBackgroundLocationUpdates = true
+        // No allowsBackgroundLocationUpdates here: on watchOS it asserts without a
+        // location background mode, and the HK workout session already keeps us alive.
         locationManager.startUpdatingLocation()
 
         timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { [weak self] _ in

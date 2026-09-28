@@ -1,0 +1,67 @@
+{
+  "buildCommand" : {
+    "command" : "build",
+    "skipDependencies" : false,
+    "style" : "buildOnly"
+  },
+  "configuredTargets" : [
+    {
+      "guid" : "cde65a663c3847b5fa89fbb0a6804b3eefbc8ed523631020f87a43f8e9b8545d"
+    },
+    {
+      "guid" : "cde65a663c3847b5fa89fbb0a6804b3e22097b5db834dbee4b34e959c1684c48"
+    }
+  ],
+  "containerPath" : "/Users/noahgreensweig/Developer/stride/Stride.xcodeproj",
+  "continueBuildingAfterErrors" : false,
+  "dependencyScope" : "workspace",
+  "enableIndexBuildArena" : false,
+  "hideShellScriptEnvironment" : false,
+  "parameters" : {
+    "action" : "build",
+    "activeArchitecture" : "undefined_arch",
+    "activeRunDestination" : {
+      "disableOnlyActiveArch" : true,
+      "hostTargetedPlatform" : null,
+      "platform" : "watchsimulator",
+      "sdk" : "watchsimulator27.0",
+      "sdkVariant" : "watchsimulator",
+      "supportedArchitectures" : [
+        "i386",
+        "x86_64"
+      ],
+      "targetArchitecture" : "undefined_arch"
+    },
+    "arenaInfo" : {
+      "buildIntermediatesPath" : "/Users/noahgreensweig/Developer/stride/build/Build/Intermediates.noindex",
+      "buildProductsPath" : "/Users/noahgreensweig/Developer/stride/build/Build/Products",
+      "derivedDataPath" : "/Users/noahgreensweig/Developer/stride/build",
+      "indexDataStoreFolderPath" : "/Users/noahgreensweig/Developer/stride/build/Index.noindex/DataStore",
+      "indexEnableDataStore" : true,
+      "indexPCHPath" : "/Users/noahgreensweig/Developer/stride/build/Index.noindex/PrecompiledHeaders",
+      "pchPath" : "/Users/noahgreensweig/Developer/stride/build/Build/Intermediates.noindex/PrecompiledHeaders"
+    },
+    "configurationName" : "Debug",
+    "overrides" : {
+      "commandLine" : {
+        "table" : {
+          "CODE_SIGNING_ALLOWED" : "NO"
+        }
+      },
+      "synthesized" : {
+        "table" : {
+          "ACTION" : "build",
+          "ENABLE_PREVIEWS" : "NO",
+          "ENABLE_XOJIT_PREVIEWS" : "YES",
+          "ONLY_ACTIVE_ARCH" : "YES"
+        }
+      }
+    }
+  },
+  "schemeCommand" : "launch",
+  "showNonLoggedProgress" : true,
+  "useDryRun" : false,
+  "useImplicitDependencies" : true,
+  "useLegacyBuildLocations" : false,
+  "useParallelTargets" : true
+}

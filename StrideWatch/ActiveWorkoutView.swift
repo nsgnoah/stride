@@ -30,6 +30,7 @@ struct CoachingView: View {
                 Text(manager.segmentRemainingText)
                     .font(.footnote.monospacedDigit())
                     .foregroundStyle(.secondary)
+                    .padding(.trailing, 10) // clear the page-indicator dots
             }
 
             if let progress = manager.segmentProgress {
@@ -47,10 +48,14 @@ struct CoachingView: View {
                 .minimumScaleFactor(0.6)
 
             if let target = manager.segment?.pace {
-                Text(coachingText(target))
-                    .font(.caption.weight(.semibold))
-                    .foregroundStyle(paceColor)
-                    .multilineTextAlignment(.center)
+                VStack(spacing: 1) {
+                    Text(coachingText)
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(paceColor)
+                    Text(target.formatted)
+                        .font(.caption2)
+                        .foregroundStyle(.secondary)
+                }
             } else {
                 Text("no target · \(Formatting.miles(manager.distance, decimals: 2))")
                     .font(.caption).foregroundStyle(.secondary)
@@ -85,12 +90,12 @@ struct CoachingView: View {
         }
     }
 
-    private func coachingText(_ target: PaceRange) -> String {
+    private var coachingText: String {
         switch manager.coaching {
-        case .speedUp: "▲ Speed up · \(target.formatted)"
-        case .slowDown: "▼ Slow down · \(target.formatted)"
-        case .onPace: "On pace · \(target.formatted)"
-        case .none: "Target \(target.formatted)"
+        case .speedUp: "▲ Speed up"
+        case .slowDown: "▼ Slow down"
+        case .onPace: "✓ On pace"
+        case .none: "Target"
         }
     }
 
