@@ -1,5 +1,6 @@
 import Foundation
 import Observation
+import WidgetKit
 
 /// Single source of truth on each device. Saved as JSON in the app's documents folder.
 /// The phone owns the plan; the watch owns run records until they're synced over.
@@ -28,9 +29,22 @@ final class AppStore {
         Set(activities.compactMap(\.plannedWorkoutID)).union(plan?.skipped ?? [])
     }
 
+    /// Shared with the widget extension. Falls back to Documents when the group isn't available.
+    static let appGroup = "group.co.nsgsolutions.stride"
+
     init(filename: String = "stride.json") {
-        let dir = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
-        url = dir.appendingPathComponent(filename)
+        let fm = FileManager.default
+        let docs = fm.urls(for: .documentDirectory, in: .userDomainMask)[0].appendingPathComponent(filename)
+        if let group = fm.containerURL(forSecurityApplicationGroupIdentifier: Self.appGroup) {
+            let shared = group.appendingPathComponent(filename)
+            // One-time move of data saved before the app group existed.
+            if !fm.fileExists(atPath: shared.path), fm.fileExists(atPath: docs.path) {
+                try? fm.copyItem(at: docs, to: shared)
+            }
+            url = shared
+        } else {
+            url = docs
+        }
         load()
     }
 
@@ -141,6 +155,7 @@ final class AppStore {
         do {
             let data = try JSONEncoder().encode(snap)
             try data.write(to: url, options: .atomic)
+            WidgetCenter.shared.reloadAllTimelines()
         } catch {
             print("Stride: save failed — \(error)")
         }

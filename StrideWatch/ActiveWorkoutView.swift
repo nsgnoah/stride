@@ -147,13 +147,3 @@ struct ControlsView: View {
     }
 }
 
-extension Segment.Kind {
-    var tint: Color {
-        switch self {
-        case .warmup: .yellow
-        case .work: .orange
-        case .recovery: .blue
-        case .cooldown: .teal
-        }
-    }
-}

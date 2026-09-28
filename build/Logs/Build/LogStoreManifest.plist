@@ -6,6 +6,90 @@
 	<integer>13</integer>
 	<key>logs</key>
 	<dict>
+		<key>11738D39-7EFF-4B72-973D-513D60276718</key>
+		<dict>
+			<key>className</key>
+			<string>IDECommandLineBuildLog</string>
+			<key>documentTypeString</key>
+			<string>&lt;nil&gt;</string>
+			<key>domainType</key>
+			<string>Xcode.IDEActivityLogDomainType.BuildLog</string>
+			<key>fileName</key>
+			<string>11738D39-7EFF-4B72-973D-513D60276718.xcactivitylog</string>
+			<key>hasPrimaryLog</key>
+			<true/>
+			<key>primaryObservable</key>
+			<dict>
+				<key>highLevelStatus</key>
+				<string>E</string>
+				<key>totalNumberOfAnalyzerIssues</key>
+				<integer>0</integer>
+				<key>totalNumberOfErrors</key>
+				<integer>2</integer>
+				<key>totalNumberOfTestFailures</key>
+				<integer>0</integer>
+				<key>totalNumberOfWarnings</key>
+				<integer>2</integer>
+			</dict>
+			<key>schemeIdentifier-containerName</key>
+			<string>Stride project</string>
+			<key>schemeIdentifier-schemeName</key>
+			<string>Stride</string>
+			<key>schemeIdentifier-sharedScheme</key>
+			<integer>1</integer>
+			<key>signature</key>
+			<string>Testing project Stride with scheme Stride</string>
+			<key>timeStartedRecording</key>
+			<real>812295634.07845604</real>
+			<key>timeStoppedRecording</key>
+			<real>812295648.53167498</real>
+			<key>title</key>
+			<string>Testing project Stride with scheme Stride</string>
+			<key>uniqueIdentifier</key>
+			<string>11738D39-7EFF-4B72-973D-513D60276718</string>
+		</dict>
+		<key>677A3026-88EC-4076-8C3C-58A646311215</key>
+		<dict>
+			<key>className</key>
+			<string>IDECommandLineBuildLog</string>
+			<key>documentTypeString</key>
+			<string>&lt;nil&gt;</string>
+			<key>domainType</key>
+			<string>Xcode.IDEActivityLogDomainType.BuildLog</string>
+			<key>fileName</key>
+			<string>677A3026-88EC-4076-8C3C-58A646311215.xcactivitylog</string>
+			<key>hasPrimaryLog</key>
+			<true/>
+			<key>primaryObservable</key>
+			<dict>
+				<key>highLevelStatus</key>
+				<string>S</string>
+				<key>totalNumberOfAnalyzerIssues</key>
+				<integer>0</integer>
+				<key>totalNumberOfErrors</key>
+				<integer>0</integer>
+				<key>totalNumberOfTestFailures</key>
+				<integer>0</integer>
+				<key>totalNumberOfWarnings</key>
+				<integer>0</integer>
+			</dict>
+			<key>schemeIdentifier-containerName</key>
+			<string>Stride project</string>
+			<key>schemeIdentifier-schemeName</key>
+			<string>Stride</string>
+			<key>schemeIdentifier-sharedScheme</key>
+			<integer>1</integer>
+			<key>signature</key>
+			<string>Testing project Stride with scheme Stride</string>
+			<key>timeStartedRecording</key>
+			<real>812295682.89431703</real>
+			<key>timeStoppedRecording</key>
+			<real>812295690.67441905</real>
+			<key>title</key>
+			<string>Testing project Stride with scheme Stride</string>
+			<key>uniqueIdentifier</key>
+			<string>677A3026-88EC-4076-8C3C-58A646311215</string>
+		</dict>
 		<key>84E8479E-D49F-445F-AB7A-22E0708624F6</key>
 		<dict>
 			<key>className</key>
@@ -131,48 +215,6 @@
 			<string>Building project Stride with scheme Stride</string>
 			<key>uniqueIdentifier</key>
 			<string>AB453329-17DC-4CA9-B768-7B0CF1F47C73</string>
-		</dict>
-		<key>C861341B-8CC6-4D34-A73E-BD7EABFB00FC</key>
-		<dict>
-			<key>className</key>
-			<string>IDECommandLineBuildLog</string>
-			<key>documentTypeString</key>
-			<string>&lt;nil&gt;</string>
-			<key>domainType</key>
-			<string>Xcode.IDEActivityLogDomainType.BuildLog</string>
-			<key>fileName</key>
-			<string>C861341B-8CC6-4D34-A73E-BD7EABFB00FC.xcactivitylog</string>
-			<key>hasPrimaryLog</key>
-			<true/>
-			<key>primaryObservable</key>
-			<dict>
-				<key>highLevelStatus</key>
-				<string>S</string>
-				<key>totalNumberOfAnalyzerIssues</key>
-				<integer>0</integer>
-				<key>totalNumberOfErrors</key>
-				<integer>0</integer>
-				<key>totalNumberOfTestFailures</key>
-				<integer>0</integer>
-				<key>totalNumberOfWarnings</key>
-				<integer>0</integer>
-			</dict>
-			<key>schemeIdentifier-containerName</key>
-			<string>Stride project</string>
-			<key>schemeIdentifier-schemeName</key>
-			<string>Stride</string>
-			<key>schemeIdentifier-sharedScheme</key>
-			<integer>1</integer>
-			<key>signature</key>
-			<string>Testing project Stride with scheme Stride</string>
-			<key>timeStartedRecording</key>
-			<real>812294801.47252703</real>
-			<key>timeStoppedRecording</key>
-			<real>812294804.04276597</real>
-			<key>title</key>
-			<string>Testing project Stride with scheme Stride</string>
-			<key>uniqueIdentifier</key>
-			<string>C861341B-8CC6-4D34-A73E-BD7EABFB00FC</string>
 		</dict>
 	</dict>
 </dict>

@@ -50,20 +50,6 @@ struct WorkoutRow: View {
     }
 }
 
-extension WorkoutType {
-    var tint: Color {
-        switch self {
-        case .easy, .shakeout: .green
-        case .long: .blue
-        case .tempo: .orange
-        case .intervals: .red
-        case .race: .purple
-        case .strength: .indigo
-        case .mobility: .teal
-        case .rest: .secondary
-        }
-    }
-}
 
 struct SettingsView: View {
     @Environment(AppStore.self) private var store

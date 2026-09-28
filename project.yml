@@ -27,11 +27,13 @@ targets:
         buildPhase: resources
     dependencies:
       - target: StrideWatch
+      - target: StrideWidget
     entitlements:
       path: Stride/Stride.entitlements
       properties:
         com.apple.developer.healthkit: true
         com.apple.developer.healthkit.access: []
+        com.apple.security.application-groups: [group.co.nsgsolutions.stride]
     info:
       path: Stride/Info.plist
       properties:
@@ -74,6 +76,7 @@ targets:
       properties:
         com.apple.developer.healthkit: true
         com.apple.developer.healthkit.access: []
+        com.apple.security.application-groups: [group.co.nsgsolutions.stride]
     info:
       path: StrideWatch/Info.plist
       properties:
@@ -90,3 +93,26 @@ targets:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: co.nsgsolutions.Stride.watchkitapp
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+
+  StrideWidget:
+    type: app-extension
+    platform: iOS
+    sources:
+      - path: StrideWidget
+      - path: Shared/Models
+      - path: Shared/Planning
+      - path: Shared/Store
+    entitlements:
+      path: StrideWidget/StrideWidget.entitlements
+      properties:
+        com.apple.security.application-groups: [group.co.nsgsolutions.stride]
+    info:
+      path: StrideWidget/Info.plist
+      properties:
+        CFBundleDisplayName: Stride
+        NSExtension:
+          NSExtensionPointIdentifier: com.apple.widgetkit-extension
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: co.nsgsolutions.Stride.widget
+        SKIP_INSTALL: YES
