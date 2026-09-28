@@ -71,6 +71,8 @@ targets:
       - path: Shared
       - path: StrideWatch/PrivacyInfo.xcprivacy
         buildPhase: resources
+    dependencies:
+      - target: StrideWatchWidget
     entitlements:
       path: StrideWatch/StrideWatch.entitlements
       properties:
@@ -115,4 +117,28 @@ targets:
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: co.nsgsolutions.Stride.widget
+        SKIP_INSTALL: YES
+
+  StrideWatchWidget:
+    type: app-extension
+    platform: watchOS
+    sources:
+      - path: StrideWidget
+        excludes: ["Info.plist", "*.entitlements"]
+      - path: Shared/Models
+      - path: Shared/Planning
+      - path: Shared/Store
+    entitlements:
+      path: StrideWatchWidget/StrideWatchWidget.entitlements
+      properties:
+        com.apple.security.application-groups: [group.co.nsgsolutions.stride]
+    info:
+      path: StrideWatchWidget/Info.plist
+      properties:
+        CFBundleDisplayName: Stride
+        NSExtension:
+          NSExtensionPointIdentifier: com.apple.widgetkit-extension
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: co.nsgsolutions.Stride.watchkitapp.widget
         SKIP_INSTALL: YES

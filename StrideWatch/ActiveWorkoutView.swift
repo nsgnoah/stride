@@ -82,7 +82,7 @@ struct CoachingView: View {
         .padding(.horizontal, 6)
         .overlay(alignment: .top) {
             if manager.phase == .paused {
-                Text("PAUSED").font(.caption2.bold()).padding(.horizontal, 8).padding(.vertical, 2)
+                Text(manager.autoPaused ? "AUTO-PAUSED" : "PAUSED").font(.caption2.bold()).padding(.horizontal, 8).padding(.vertical, 2)
                     .background(.yellow, in: Capsule()).foregroundStyle(.black)
                     .offset(y: -18)
             }

@@ -28,6 +28,11 @@ final class WorkoutManager: NSObject {
     /// Most recent mile split, shown briefly in place of the segment name.
     var lastSplit: ActivityRecord.Split?
     var splitBannerUntil: Date = .distantPast
+    /// True while paused because she stopped moving (traffic light, shoelace). Resumes on its own.
+    var autoPaused = false
+    var autoPauseEnabled = true
+    private var movingUpdates = 0
+    private var countdownFired: Set<Int> = []
 
     // HealthKit
     private let healthStore = HKHealthStore()
@@ -136,6 +141,7 @@ final class WorkoutManager: NSObject {
     }
 
     func togglePause() {
+        autoPaused = false
         switch phase {
         case .running:
             phase = .paused
@@ -163,6 +169,7 @@ final class WorkoutManager: NSObject {
             segmentDistance = 0
             segmentElapsed = 0
             coaching = .none
+            countdownFired = []
             lastAlert = .now // grace period before coaching kicks in
             WKInterfaceDevice.current().play(.notification)
         } else {
@@ -216,6 +223,9 @@ final class WorkoutManager: NSObject {
         completed = nil
         lastSplit = nil
         splitBannerUntil = .distantPast
+        autoPaused = false
+        movingUpdates = 0
+        countdownFired = []
         samples = []
         splits = []
         heartRateSamples = []
@@ -244,7 +254,41 @@ final class WorkoutManager: NSObject {
         updatePace()
         recordSplitIfNeeded()
         coach()
+        countdownIfNeeded()
         autoAdvanceIfNeeded()
+        autoPauseIfStationary()
+    }
+
+    /// Three quick taps as a timed segment runs out, one tap 30 m before a distance rep ends.
+    private func countdownIfNeeded() {
+        guard let segment else { return }
+        switch segment.goal {
+        case .time(let t):
+            let remaining = Int((t - segmentElapsed).rounded(.up))
+            if (1...3).contains(remaining), !countdownFired.contains(remaining) {
+                countdownFired.insert(remaining)
+                WKInterfaceDevice.current().play(.click)
+            }
+        case .distance(let m) where segment.kind == .work && m <= 1609:
+            if m - segmentDistance <= 30, !countdownFired.contains(0) {
+                countdownFired.insert(0)
+                WKInterfaceDevice.current().play(.click)
+            }
+        default: break
+        }
+    }
+
+    /// Under 3 m covered in the last 8 s (after the first 20 s) → pause. Location updates resume it.
+    private func autoPauseIfStationary() {
+        guard autoPauseEnabled, elapsed > 20, let last = samples.last else { return }
+        let cutoff = Date.now.addingTimeInterval(-8)
+        guard let ref = samples.first(where: { $0.time >= cutoff }),
+              last.time.timeIntervalSince(ref.time) >= 6 else { return }
+        if last.distance - ref.distance < 3 {
+            movingUpdates = 0
+            togglePause()
+            autoPaused = true
+        }
     }
 
     private func updatePace() {
@@ -355,6 +399,16 @@ extension WorkoutManager: HKLiveWorkoutBuilderDelegate {
 extension WorkoutManager: CLLocationManagerDelegate {
     nonisolated func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         Task { @MainActor in
+            if autoPaused, phase == .paused {
+                // Two consecutive fixes above walking speed and we're back.
+                if let speed = locations.last?.speed, speed > 1.0 {
+                    movingUpdates += 1
+                    if movingUpdates >= 2 { togglePause() }
+                } else {
+                    movingUpdates = 0
+                }
+                return
+            }
             guard phase == .running else { return }
             for loc in locations where loc.horizontalAccuracy >= 0 && loc.horizontalAccuracy < 30 {
                 if let last = lastLocation {

@@ -42,15 +42,15 @@
 		</data>
 		<key>PlugIns/StrideWidget.appex/StrideWidget</key>
 		<data>
-		Jwx5eiVb9WbBZP/9Oq8MkoBXJXU=
+		J6oUfoErU0vPKkGzzjN+Hzcn454=
 		</data>
 		<key>PlugIns/StrideWidget.appex/StrideWidget.debug.dylib</key>
 		<data>
-		MHVsQ+Xxqwvi30x5LwrAR1JAmIA=
+		L5+ran4MOzRd+7+XaxqurvneebQ=
 		</data>
 		<key>PlugIns/StrideWidget.appex/_CodeSignature/CodeResources</key>
 		<data>
-		pdwFykhmVVq94XVzBlfSVNpsQg4=
+		XMN+rNP0AHJSWlejDalPv5LVUtM=
 		</data>
 		<key>PlugIns/StrideWidget.appex/__preview.dylib</key>
 		<data>
@@ -76,21 +76,41 @@
 		<data>
 		n57qDP4tZfLD1rCS43W0B4LQjzE=
 		</data>
+		<key>Watch/StrideWatch.app/PlugIns/StrideWatchWidget.appex/Info.plist</key>
+		<data>
+		bwZVWrQ1e4sb7j9D/c9LRYHdx/g=
+		</data>
+		<key>Watch/StrideWatch.app/PlugIns/StrideWatchWidget.appex/StrideWatchWidget</key>
+		<data>
+		WbTxe6MWpCJbx1d0lHWW4tVGwrQ=
+		</data>
+		<key>Watch/StrideWatch.app/PlugIns/StrideWatchWidget.appex/StrideWatchWidget.debug.dylib</key>
+		<data>
+		oXlNGdE1tMOY73n/btp5V4XUqbw=
+		</data>
+		<key>Watch/StrideWatch.app/PlugIns/StrideWatchWidget.appex/_CodeSignature/CodeResources</key>
+		<data>
+		hIHqA6m8bHN3zTS81xqPzSLaK4c=
+		</data>
+		<key>Watch/StrideWatch.app/PlugIns/StrideWatchWidget.appex/__preview.dylib</key>
+		<data>
+		SdQL7Gs5ZB/ywejOZi/jlSDnjHE=
+		</data>
 		<key>Watch/StrideWatch.app/PrivacyInfo.xcprivacy</key>
 		<data>
 		ucg9pita0v8d353x3NuGfxweQYU=
 		</data>
 		<key>Watch/StrideWatch.app/StrideWatch</key>
 		<data>
-		/Cww26orumL2JppkiHhaGGgghmk=
+		Ps3bAu+kwMUUjtiTK1kYD4oP+zE=
 		</data>
 		<key>Watch/StrideWatch.app/StrideWatch.debug.dylib</key>
 		<data>
-		Ldwy/bYHsxc4Xwnn7PXokAWmsUc=
+		7ovafrninCkcqj4yvZWlJ8Vuik8=
 		</data>
 		<key>Watch/StrideWatch.app/_CodeSignature/CodeResources</key>
 		<data>
-		EedoF5HtuopDuovn6CqMLmdvH3I=
+		mHfN7cbE3hzuQJpx1s+ixofAzw8=
 		</data>
 		<key>Watch/StrideWatch.app/__preview.dylib</key>
 		<data>
@@ -156,21 +176,21 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			zkPE4CIKRrdYHyP+Sr5GkVesSmO9NZd2UwsmsqBBQoE=
+			/CL3Ls2aatJzCa8rJsUIFFf2yORZnYHnxCsv72LCmv8=
 			</data>
 		</dict>
 		<key>PlugIns/StrideWidget.appex/StrideWidget.debug.dylib</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			t0QWDL4JgvgwIfpJmC7CElJsZQYUkH5iD0zbweWqbs4=
+			2+7eW7AQfrKW+DgBbsI1tZsmb4VzWHuUvFhdsJcdSFg=
 			</data>
 		</dict>
 		<key>PlugIns/StrideWidget.appex/_CodeSignature/CodeResources</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			8CDTynZe9IxIgBnzIb0knawsv5E6A9qFTzrr76nONaA=
+			aiccGZe48/8DZ9SOKYfkoSAfcAUeV9nEeQ+Z2v/bwRU=
 			</data>
 		</dict>
 		<key>PlugIns/StrideWidget.appex/__preview.dylib</key>
@@ -215,6 +235,41 @@
 			glAhkclISwTWhTdPmHmgBmBpxJuKyuegSwHTjQfo7KA=
 			</data>
 		</dict>
+		<key>Watch/StrideWatch.app/PlugIns/StrideWatchWidget.appex/Info.plist</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			xAvR1cBWVVleiACDQ1FuTjyoWSefV0Eb0BnKFoq9hWQ=
+			</data>
+		</dict>
+		<key>Watch/StrideWatch.app/PlugIns/StrideWatchWidget.appex/StrideWatchWidget</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			MWKtSYdv8CaeEZdCIf3q9ZImDmSFjC59EEhk/4/EfL8=
+			</data>
+		</dict>
+		<key>Watch/StrideWatch.app/PlugIns/StrideWatchWidget.appex/StrideWatchWidget.debug.dylib</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			kUUbHnfYQSlWOx5+urPBWBThoFFR82Mp6t6Q2XXYGNo=
+			</data>
+		</dict>
+		<key>Watch/StrideWatch.app/PlugIns/StrideWatchWidget.appex/_CodeSignature/CodeResources</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			tAVlAd4Rx/1Vsr9Z16+5D3guimg9MObH7yW+a2nLUTY=
+			</data>
+		</dict>
+		<key>Watch/StrideWatch.app/PlugIns/StrideWatchWidget.appex/__preview.dylib</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			KvPDbmfgXXrvTJBwDRVggtENKhgmc8CyZItNPNClZX8=
+			</data>
+		</dict>
 		<key>Watch/StrideWatch.app/PrivacyInfo.xcprivacy</key>
 		<dict>
 			<key>hash2</key>
@@ -226,21 +281,21 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			0gkIR6an6pm2R86+75NTSEwrW47ICNNWCht6Ba6bSOk=
+			/EoHQb9UZjvHqj1mKIavGNVKjEdlFg1ctM4yqJIBL8c=
 			</data>
 		</dict>
 		<key>Watch/StrideWatch.app/StrideWatch.debug.dylib</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			c99YBUjh8AGrgT+c/v5DjPN2dozN1/pIpWPTcfXh96c=
+			fmv0BTSbwn+OHHqxf1p67Twqv/sQj41e2/y/3eZAIu4=
 			</data>
 		</dict>
 		<key>Watch/StrideWatch.app/_CodeSignature/CodeResources</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			5UBIzYWg/YHoO+zY83aX1xlZCF0dLQU6Vd7jyhEa0Og=
+			PdnfU7xkHLmQWuDemUMq6laRFSpITsvB4cqHYnaSn48=
 			</data>
 		</dict>
 		<key>Watch/StrideWatch.app/__preview.dylib</key>

@@ -48,6 +48,48 @@
 			<key>uniqueIdentifier</key>
 			<string>11738D39-7EFF-4B72-973D-513D60276718</string>
 		</dict>
+		<key>4785BDA8-7210-4ED7-9867-F93717F14D0B</key>
+		<dict>
+			<key>className</key>
+			<string>IDECommandLineBuildLog</string>
+			<key>documentTypeString</key>
+			<string>&lt;nil&gt;</string>
+			<key>domainType</key>
+			<string>Xcode.IDEActivityLogDomainType.BuildLog</string>
+			<key>fileName</key>
+			<string>4785BDA8-7210-4ED7-9867-F93717F14D0B.xcactivitylog</string>
+			<key>hasPrimaryLog</key>
+			<true/>
+			<key>primaryObservable</key>
+			<dict>
+				<key>highLevelStatus</key>
+				<string>W</string>
+				<key>totalNumberOfAnalyzerIssues</key>
+				<integer>0</integer>
+				<key>totalNumberOfErrors</key>
+				<integer>0</integer>
+				<key>totalNumberOfTestFailures</key>
+				<integer>0</integer>
+				<key>totalNumberOfWarnings</key>
+				<integer>2</integer>
+			</dict>
+			<key>schemeIdentifier-containerName</key>
+			<string>Stride project</string>
+			<key>schemeIdentifier-schemeName</key>
+			<string>Stride</string>
+			<key>schemeIdentifier-sharedScheme</key>
+			<integer>1</integer>
+			<key>signature</key>
+			<string>Testing project Stride with scheme Stride</string>
+			<key>timeStartedRecording</key>
+			<real>812296058.72611499</real>
+			<key>timeStoppedRecording</key>
+			<real>812296089.24013102</real>
+			<key>title</key>
+			<string>Testing project Stride with scheme Stride</string>
+			<key>uniqueIdentifier</key>
+			<string>4785BDA8-7210-4ED7-9867-F93717F14D0B</string>
+		</dict>
 		<key>677A3026-88EC-4076-8C3C-58A646311215</key>
 		<dict>
 			<key>className</key>
@@ -90,7 +132,7 @@
 			<key>uniqueIdentifier</key>
 			<string>677A3026-88EC-4076-8C3C-58A646311215</string>
 		</dict>
-		<key>84E8479E-D49F-445F-AB7A-22E0708624F6</key>
+		<key>D04A6C86-5738-4B80-A4E9-D72996727D65</key>
 		<dict>
 			<key>className</key>
 			<string>IDECommandLineBuildLog</string>
@@ -99,63 +141,21 @@
 			<key>domainType</key>
 			<string>Xcode.IDEActivityLogDomainType.BuildLog</string>
 			<key>fileName</key>
-			<string>84E8479E-D49F-445F-AB7A-22E0708624F6.xcactivitylog</string>
+			<string>D04A6C86-5738-4B80-A4E9-D72996727D65.xcactivitylog</string>
 			<key>hasPrimaryLog</key>
 			<true/>
 			<key>primaryObservable</key>
 			<dict>
 				<key>highLevelStatus</key>
-				<string>S</string>
+				<string>E</string>
 				<key>totalNumberOfAnalyzerIssues</key>
 				<integer>0</integer>
 				<key>totalNumberOfErrors</key>
-				<integer>0</integer>
+				<integer>1</integer>
 				<key>totalNumberOfTestFailures</key>
 				<integer>0</integer>
 				<key>totalNumberOfWarnings</key>
-				<integer>0</integer>
-			</dict>
-			<key>schemeIdentifier-containerName</key>
-			<string>Stride project</string>
-			<key>schemeIdentifier-schemeName</key>
-			<string>Stride</string>
-			<key>schemeIdentifier-sharedScheme</key>
-			<integer>1</integer>
-			<key>signature</key>
-			<string>Building project Stride with scheme Stride</string>
-			<key>timeStartedRecording</key>
-			<real>812295222.53212798</real>
-			<key>timeStoppedRecording</key>
-			<real>812295227.58161402</real>
-			<key>title</key>
-			<string>Building project Stride with scheme Stride</string>
-			<key>uniqueIdentifier</key>
-			<string>84E8479E-D49F-445F-AB7A-22E0708624F6</string>
-		</dict>
-		<key>A9C4D409-A6E0-49F6-9CA9-28388F807685</key>
-		<dict>
-			<key>className</key>
-			<string>IDECommandLineBuildLog</string>
-			<key>documentTypeString</key>
-			<string>&lt;nil&gt;</string>
-			<key>domainType</key>
-			<string>Xcode.IDEActivityLogDomainType.BuildLog</string>
-			<key>fileName</key>
-			<string>A9C4D409-A6E0-49F6-9CA9-28388F807685.xcactivitylog</string>
-			<key>hasPrimaryLog</key>
-			<true/>
-			<key>primaryObservable</key>
-			<dict>
-				<key>highLevelStatus</key>
-				<string>W</string>
-				<key>totalNumberOfAnalyzerIssues</key>
-				<integer>0</integer>
-				<key>totalNumberOfErrors</key>
-				<integer>0</integer>
-				<key>totalNumberOfTestFailures</key>
-				<integer>0</integer>
-				<key>totalNumberOfWarnings</key>
-				<integer>2</integer>
+				<integer>1</integer>
 			</dict>
 			<key>schemeIdentifier-containerName</key>
 			<string>Stride project</string>
@@ -166,55 +166,13 @@
 			<key>signature</key>
 			<string>Testing project Stride with scheme Stride</string>
 			<key>timeStartedRecording</key>
-			<real>812295156.48373103</real>
+			<real>812296040.52805996</real>
 			<key>timeStoppedRecording</key>
-			<real>812295174.73540902</real>
+			<real>812296041.66525996</real>
 			<key>title</key>
 			<string>Testing project Stride with scheme Stride</string>
 			<key>uniqueIdentifier</key>
-			<string>A9C4D409-A6E0-49F6-9CA9-28388F807685</string>
-		</dict>
-		<key>AB453329-17DC-4CA9-B768-7B0CF1F47C73</key>
-		<dict>
-			<key>className</key>
-			<string>IDECommandLineBuildLog</string>
-			<key>documentTypeString</key>
-			<string>&lt;nil&gt;</string>
-			<key>domainType</key>
-			<string>Xcode.IDEActivityLogDomainType.BuildLog</string>
-			<key>fileName</key>
-			<string>AB453329-17DC-4CA9-B768-7B0CF1F47C73.xcactivitylog</string>
-			<key>hasPrimaryLog</key>
-			<true/>
-			<key>primaryObservable</key>
-			<dict>
-				<key>highLevelStatus</key>
-				<string>S</string>
-				<key>totalNumberOfAnalyzerIssues</key>
-				<integer>0</integer>
-				<key>totalNumberOfErrors</key>
-				<integer>0</integer>
-				<key>totalNumberOfTestFailures</key>
-				<integer>0</integer>
-				<key>totalNumberOfWarnings</key>
-				<integer>0</integer>
-			</dict>
-			<key>schemeIdentifier-containerName</key>
-			<string>Stride project</string>
-			<key>schemeIdentifier-schemeName</key>
-			<string>Stride</string>
-			<key>schemeIdentifier-sharedScheme</key>
-			<integer>1</integer>
-			<key>signature</key>
-			<string>Building project Stride with scheme Stride</string>
-			<key>timeStartedRecording</key>
-			<real>812295353.01192605</real>
-			<key>timeStoppedRecording</key>
-			<real>812295367.09939301</real>
-			<key>title</key>
-			<string>Building project Stride with scheme Stride</string>
-			<key>uniqueIdentifier</key>
-			<string>AB453329-17DC-4CA9-B768-7B0CF1F47C73</string>
+			<string>D04A6C86-5738-4B80-A4E9-D72996727D65</string>
 		</dict>
 	</dict>
 </dict>

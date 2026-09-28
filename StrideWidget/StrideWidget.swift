@@ -50,7 +50,11 @@ struct TodayProvider: TimelineProvider {
 
     @MainActor
     private func load() -> TodayEntry {
+        #if os(watchOS)
+        let store = AppStore(filename: "stride-watch.json")
+        #else
         let store = AppStore()
+        #endif
         guard let plan = store.plan else {
             return TodayEntry(date: .now, workouts: [], week: nil, weekCount: 0, done: [], skipped: [], hasPlan: false)
         }
@@ -74,7 +78,11 @@ struct TodayWidget: Widget {
         }
         .configurationDisplayName("Today's run")
         .description("What's on the plan today, and how the week looks.")
+        #if os(watchOS)
+        .supportedFamilies([.accessoryRectangular, .accessoryInline, .accessoryCircular, .accessoryCorner])
+        #else
         .supportedFamilies([.systemSmall, .systemMedium, .accessoryRectangular, .accessoryInline])
+        #endif
     }
 }
 
@@ -93,8 +101,30 @@ struct TodayWidgetView: View {
         switch family {
         case .accessoryInline: inline
         case .accessoryRectangular: rectangular
+        case .accessoryCircular, .accessoryCorner: circular
+        #if os(iOS)
         case .systemMedium: medium
         default: small
+        #else
+        default: rectangular
+        #endif
+        }
+    }
+
+    /// Icon plus the distance, for the corner and circular slots on the watch face.
+    private var circular: some View {
+        ZStack {
+            AccessoryWidgetBackground()
+            VStack(spacing: 0) {
+                Image(systemName: isDone ? "checkmark" : (main?.type.symbol ?? "figure.run"))
+                    .font(.system(size: 16, weight: .semibold))
+                if let main, main.plannedMeters > 0 {
+                    Text(Units.miles(main.plannedMeters).formatted(.number.precision(.fractionLength(0...1))))
+                        .font(.system(size: 11, weight: .semibold, design: .rounded))
+                } else {
+                    Text(main == nil ? "rest" : "").font(.system(size: 9))
+                }
+            }
         }
     }
 
@@ -129,6 +159,7 @@ struct TodayWidgetView: View {
         }
     }
 
+    #if os(iOS)
     private var small: some View {
         VStack(alignment: .leading, spacing: 6) {
             HStack {
@@ -192,10 +223,13 @@ struct TodayWidgetView: View {
             }
         }
     }
+    #endif
 }
 
+#if os(iOS)
 #Preview(as: .systemSmall) {
     TodayWidget()
 } timeline: {
     TodayEntry.placeholder
 }
+#endif

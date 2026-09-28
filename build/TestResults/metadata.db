@@ -18,7 +18,7 @@
 				<key>zonesAreOrdered</key>
 				<dict>
 					<key>mrnet</key>
-					<real>2.09808349609375e-05</real>
+					<real>1.9788742065429688e-05</real>
 				</dict>
 			</dict>
 			<key>PlanGeneratorTests</key>
@@ -26,82 +26,82 @@
 				<key>everyRunHasWarmupAndCooldownRoutines</key>
 				<dict>
 					<key>mrnet</key>
-					<real>0.000885009765625</real>
+					<real>0.00088095664978027344</real>
 				</dict>
 				<key>firstTwoWeeksAreAllEasy</key>
 				<dict>
 					<key>mrnet</key>
-					<real>0.053444623947143555</real>
+					<real>0.046916961669921875</real>
 				</dict>
 				<key>hardRunsAvoidLiftingDays</key>
 				<dict>
 					<key>mrnet</key>
-					<real>0.037786960601806641</real>
+					<real>0.036202907562255859</real>
 				</dict>
 				<key>longRunNeverExceedsTheGoalCap</key>
 				<dict>
 					<key>mrnet</key>
-					<real>0.049352169036865234</real>
+					<real>0.048064231872558594</real>
 				</dict>
 				<key>mobilityLandsAfterLongRun</key>
 				<dict>
 					<key>mrnet</key>
-					<real>0.00062489509582519531</real>
+					<real>0.00061178207397460938</real>
 				</dict>
 				<key>mondayRaceHasNoShakeoutAfterTheRace</key>
 				<dict>
 					<key>mrnet</key>
-					<real>0.00071001052856445312</real>
+					<real>0.00067973136901855469</real>
 				</dict>
 				<key>moveAndSkipRoundTrip</key>
 				<dict>
 					<key>mrnet</key>
-					<real>0.0016429424285888672</real>
+					<real>0.00069499015808105469</real>
 				</dict>
 				<key>noHardRunTheDayAfterALift</key>
 				<dict>
 					<key>mrnet</key>
-					<real>0.027438879013061523</real>
+					<real>0.025262117385864258</real>
 				</dict>
 				<key>plansRoundTripThroughJSON</key>
 				<dict>
 					<key>mrnet</key>
-					<real>0.004360198974609375</real>
+					<real>0.0033717155456542969</real>
 				</dict>
 				<key>raceWeekIsLighterThanTheWeekBefore</key>
 				<dict>
 					<key>mrnet</key>
-					<real>0.039762973785400391</real>
+					<real>0.036711931228637695</real>
 				</dict>
 				<key>raceWeekIsTheLastWeek</key>
 				<dict>
 					<key>mrnet</key>
-					<real>0.00091695785522460938</real>
+					<real>0.0011899471282958984</real>
 				</dict>
 				<key>rebuildingKeepsWorkoutIDs</key>
 				<dict>
 					<key>mrnet</key>
-					<real>0.0019819736480712891</real>
+					<real>0.0013158321380615234</real>
 				</dict>
 				<key>runsPerWeekMatchesTheProfile</key>
 				<dict>
 					<key>mrnet</key>
-					<real>0.051240205764770508</real>
+					<real>0.049330949783325195</real>
 				</dict>
 				<key>startingMidweekKeepsCurrentWeek</key>
 				<dict>
 					<key>mrnet</key>
-					<real>2.574920654296875e-05</real>
+					<real>3.2186508178710938e-05</real>
 				</dict>
 				<key>startingOnSundayBeginsNextMonday</key>
 				<dict>
 					<key>mrnet</key>
-					<real>0.00089001655578613281</real>
+					<real>0.00068688392639160156</real>
 				</dict>
 				<key>volumeNeverJumpsMoreThanFifteenPercentAboveThePriorPeak</key>
 				<dict>
 					<key>mrnet</key>
-					<real>0.049630880355834961</real>
+					<real>0.047468185424804688</real>
 				</dict>
 				<key>volumeNeverJumpsMoreThanFifteenPercentWeekToWeek</key>
 				<dict>

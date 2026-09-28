@@ -16,13 +16,33 @@
 		<data>
 		n57qDP4tZfLD1rCS43W0B4LQjzE=
 		</data>
+		<key>PlugIns/StrideWatchWidget.appex/Info.plist</key>
+		<data>
+		bwZVWrQ1e4sb7j9D/c9LRYHdx/g=
+		</data>
+		<key>PlugIns/StrideWatchWidget.appex/StrideWatchWidget</key>
+		<data>
+		WbTxe6MWpCJbx1d0lHWW4tVGwrQ=
+		</data>
+		<key>PlugIns/StrideWatchWidget.appex/StrideWatchWidget.debug.dylib</key>
+		<data>
+		oXlNGdE1tMOY73n/btp5V4XUqbw=
+		</data>
+		<key>PlugIns/StrideWatchWidget.appex/_CodeSignature/CodeResources</key>
+		<data>
+		hIHqA6m8bHN3zTS81xqPzSLaK4c=
+		</data>
+		<key>PlugIns/StrideWatchWidget.appex/__preview.dylib</key>
+		<data>
+		SdQL7Gs5ZB/ywejOZi/jlSDnjHE=
+		</data>
 		<key>PrivacyInfo.xcprivacy</key>
 		<data>
 		ucg9pita0v8d353x3NuGfxweQYU=
 		</data>
 		<key>StrideWatch.debug.dylib</key>
 		<data>
-		Ldwy/bYHsxc4Xwnn7PXokAWmsUc=
+		7ovafrninCkcqj4yvZWlJ8Vuik8=
 		</data>
 		<key>__preview.dylib</key>
 		<data>
@@ -38,6 +58,41 @@
 			cRl+/9EttyI4zhdYJEvHddodEdxXKKgnEr6WN7Q9qBs=
 			</data>
 		</dict>
+		<key>PlugIns/StrideWatchWidget.appex/Info.plist</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			xAvR1cBWVVleiACDQ1FuTjyoWSefV0Eb0BnKFoq9hWQ=
+			</data>
+		</dict>
+		<key>PlugIns/StrideWatchWidget.appex/StrideWatchWidget</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			MWKtSYdv8CaeEZdCIf3q9ZImDmSFjC59EEhk/4/EfL8=
+			</data>
+		</dict>
+		<key>PlugIns/StrideWatchWidget.appex/StrideWatchWidget.debug.dylib</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			kUUbHnfYQSlWOx5+urPBWBThoFFR82Mp6t6Q2XXYGNo=
+			</data>
+		</dict>
+		<key>PlugIns/StrideWatchWidget.appex/_CodeSignature/CodeResources</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			tAVlAd4Rx/1Vsr9Z16+5D3guimg9MObH7yW+a2nLUTY=
+			</data>
+		</dict>
+		<key>PlugIns/StrideWatchWidget.appex/__preview.dylib</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			KvPDbmfgXXrvTJBwDRVggtENKhgmc8CyZItNPNClZX8=
+			</data>
+		</dict>
 		<key>PrivacyInfo.xcprivacy</key>
 		<dict>
 			<key>hash2</key>
@@ -49,7 +104,7 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			c99YBUjh8AGrgT+c/v5DjPN2dozN1/pIpWPTcfXh96c=
+			fmv0BTSbwn+OHHqxf1p67Twqv/sQj41e2/y/3eZAIu4=
 			</data>
 		</dict>
 		<key>__preview.dylib</key>
