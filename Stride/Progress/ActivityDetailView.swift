@@ -102,7 +102,7 @@ struct SplitsChart: View {
                     .foregroundStyle(.green.opacity(0.12))
             }
             ForEach(splits, id: \.mile) { split in
-                BarMark(x: .value("Mile", split.mile), yStart: .value("Floor", yDomain.lowerBound), yEnd: .value("Pace", split.seconds / 60), width: .ratio(0.55))
+                BarMark(x: .value("Mile", Double(split.mile)), yStart: .value("Floor", yDomain.lowerBound), yEnd: .value("Pace", split.seconds / 60), width: .fixed(28))
                     .foregroundStyle(color(for: split.seconds))
                     .cornerRadius(4)
                     .annotation(position: .top) {
@@ -121,7 +121,11 @@ struct SplitsChart: View {
             }
         }
         .chartXAxis {
-            AxisMarks(values: splits.map(\.mile)) { _ in AxisValueLabel() }
+            AxisMarks(values: splits.map { Double($0.mile) }) { value in
+                AxisValueLabel {
+                    if let m = value.as(Double.self) { Text("\(Int(m))") }
+                }
+            }
         }
     }
 

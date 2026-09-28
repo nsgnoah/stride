@@ -29,9 +29,14 @@ struct WorkoutRow: View {
                 .font(.title3)
                 .foregroundStyle(workout.type.tint)
                 .frame(width: 28)
+            let skipped = store.plan?.isSkipped(workout) == true
             VStack(alignment: .leading, spacing: 2) {
                 Text(workout.title).font(.headline)
-                if let pace = workout.mainPace {
+                    .strikethrough(skipped)
+                    .foregroundStyle(skipped ? .secondary : .primary)
+                if skipped {
+                    Text("Skipped").font(.subheadline).foregroundStyle(.secondary)
+                } else if let pace = workout.mainPace {
                     Text(pace.formatted).font(.subheadline).foregroundStyle(.secondary)
                 } else if !workout.summary.isEmpty {
                     Text(workout.summary).font(.subheadline).foregroundStyle(.secondary).lineLimit(1)

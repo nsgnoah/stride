@@ -90,7 +90,7 @@
 			<key>uniqueIdentifier</key>
 			<string>A9C4D409-A6E0-49F6-9CA9-28388F807685</string>
 		</dict>
-		<key>B06A0826-ED64-43C4-B294-B8BDFBB172B5</key>
+		<key>AB453329-17DC-4CA9-B768-7B0CF1F47C73</key>
 		<dict>
 			<key>className</key>
 			<string>IDECommandLineBuildLog</string>
@@ -99,7 +99,7 @@
 			<key>domainType</key>
 			<string>Xcode.IDEActivityLogDomainType.BuildLog</string>
 			<key>fileName</key>
-			<string>B06A0826-ED64-43C4-B294-B8BDFBB172B5.xcactivitylog</string>
+			<string>AB453329-17DC-4CA9-B768-7B0CF1F47C73.xcactivitylog</string>
 			<key>hasPrimaryLog</key>
 			<true/>
 			<key>primaryObservable</key>
@@ -122,15 +122,15 @@
 			<key>schemeIdentifier-sharedScheme</key>
 			<integer>1</integer>
 			<key>signature</key>
-			<string>Testing project Stride with scheme Stride</string>
+			<string>Building project Stride with scheme Stride</string>
 			<key>timeStartedRecording</key>
-			<real>812294741.87573397</real>
+			<real>812295353.01192605</real>
 			<key>timeStoppedRecording</key>
-			<real>812294750.14484203</real>
+			<real>812295367.09939301</real>
 			<key>title</key>
-			<string>Testing project Stride with scheme Stride</string>
+			<string>Building project Stride with scheme Stride</string>
 			<key>uniqueIdentifier</key>
-			<string>B06A0826-ED64-43C4-B294-B8BDFBB172B5</string>
+			<string>AB453329-17DC-4CA9-B768-7B0CF1F47C73</string>
 		</dict>
 		<key>C861341B-8CC6-4D34-A73E-BD7EABFB00FC</key>
 		<dict>
