@@ -10,14 +10,20 @@ struct PlanSetupView: View {
     @State private var recentMinutes: Int
     @State private var recentSeconds: Int
     private let isEditing: Bool
+    private let startFresh: Bool
 
-    init(existing: RunnerProfile? = nil) {
-        let p = existing ?? RunnerProfile()
+    init(existing: RunnerProfile? = nil, startFresh: Bool = false) {
+        self.startFresh = startFresh
+        var p = existing ?? RunnerProfile()
+        if startFresh {
+            // A new goal after a finished plan: keep her schedule, reset the date.
+            p.raceDate = Calendar.current.date(byAdding: .weekOfYear, value: p.goal.defaultWeeks, to: .now)!
+        }
         _profile = State(initialValue: p)
         _recentMiles = State(initialValue: Units.miles(p.recentRunMeters))
         _recentMinutes = State(initialValue: Int(p.recentRunSeconds) / 60)
         _recentSeconds = State(initialValue: Int(p.recentRunSeconds) % 60)
-        isEditing = existing != nil
+        isEditing = existing != nil && !startFresh
     }
 
     private var preview: PaceProfile { PaceCalculator.profile(for: builtProfile) }
@@ -108,11 +114,12 @@ struct PlanSetupView: View {
             }
             .navigationTitle(isEditing ? "Adjust Plan" : "Stride")
             .toolbar {
-                if isEditing {
+                if isEditing || startFresh {
                     ToolbarItem(placement: .cancellationAction) { Button("Cancel") { dismiss() } }
                 }
                 ToolbarItem(placement: .confirmationAction) {
                     Button(isEditing ? "Rebuild" : "Build my plan") {
+                        if startFresh { store.plan = nil }
                         store.createPlan(from: builtProfile)
                         dismiss()
                     }

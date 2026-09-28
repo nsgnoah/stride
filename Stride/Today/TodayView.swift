@@ -3,6 +3,7 @@ import SwiftUI
 struct TodayView: View {
     @Environment(AppStore.self) private var store
     @State private var loggingLift = false
+    @State private var buildingNext = false
 
     var body: some View {
         NavigationStack {
@@ -27,7 +28,10 @@ struct TodayView: View {
                         }
                     }
                 } else if let plan = store.plan, plan.raceDate < .now {
-                    Section { Text("Plan complete. Build a new one from Settings.") }
+                    Section {
+                        Text("Plan complete — nice work.")
+                        Button("Build the next plan…") { buildingNext = true }
+                    }
                 }
 
                 let missed = store.missedRuns
@@ -69,6 +73,9 @@ struct TodayView: View {
             .navigationTitle("Today")
             .navigationDestination(for: Workout.self) { WorkoutDetailView(workout: $0) }
             .sheet(isPresented: $loggingLift) { LogActivityView() }
+            .sheet(isPresented: $buildingNext) {
+                NavigationStack { PlanSetupView(existing: store.profile, startFresh: true) }
+            }
         }
     }
 
@@ -123,6 +130,7 @@ struct WorkoutDetailView: View {
     let workout: Workout
     @State private var moving = false
     @State private var moveDate = Date.now
+    @State private var loggingManually = false
 
     private var isSkipped: Bool { store.plan?.isSkipped(workout) == true }
     private var isDone: Bool { store.isCompleted(workout) }
@@ -193,11 +201,17 @@ struct WorkoutDetailView: View {
                 routineSection(nil, routine)
             }
 
-            if workout.type == .strength || workout.type == .mobility, !store.isCompleted(workout) {
+            if workout.type == .strength || workout.type == .mobility, !isDone {
                 Section {
                     Button("Mark done") {
                         store.record(ActivityRecord(date: .now, type: workout.type, plannedWorkoutID: workout.id, durationSeconds: 0, meters: 0))
                     }
+                }
+            } else if workout.type.isRun, !isDone {
+                Section {
+                    Button("Log this run manually…") { loggingManually = true }
+                } footer: {
+                    Text("For runs done without the watch — a treadmill, a borrowed tracker, a dead battery.")
                 }
             }
         }
@@ -221,6 +235,9 @@ struct WorkoutDetailView: View {
                     }
                 }
             }
+        }
+        .sheet(isPresented: $loggingManually) {
+            LogActivityView(prefill: workout, date: store.plan?.allDays.first { $0.workouts.contains { $0.id == workout.id } }?.date)
         }
         .sheet(isPresented: $moving) {
             NavigationStack {
@@ -316,19 +333,33 @@ struct RoutineView: View {
 struct LogActivityView: View {
     @Environment(AppStore.self) private var store
     @Environment(\.dismiss) private var dismiss
-    @State private var date = Date.now
-    @State private var type: WorkoutType = .strength
-    @State private var minutes = 45
-    @State private var miles = 0.0
+    @State private var date: Date
+    @State private var type: WorkoutType
+    @State private var minutes: Int
+    @State private var miles: Double
     @State private var notes = ""
+    /// When opened from a planned workout, the record is tied to that workout.
+    private let prefill: Workout?
+
+    init(prefill: Workout? = nil, date: Date? = nil) {
+        self.prefill = prefill
+        _date = State(initialValue: min(date ?? .now, .now))
+        _type = State(initialValue: prefill?.type ?? .strength)
+        _minutes = State(initialValue: prefill.map { max(5, Int($0.estimatedDuration / 60 / 5) * 5) } ?? 45)
+        _miles = State(initialValue: prefill.map { (Units.miles($0.plannedMeters) * 10).rounded() / 10 } ?? 0)
+    }
 
     var body: some View {
         NavigationStack {
             Form {
-                Picker("Type", selection: $type) {
-                    Text("Strength").tag(WorkoutType.strength)
-                    Text("Mobility").tag(WorkoutType.mobility)
-                    Text("Easy run").tag(WorkoutType.easy)
+                if let prefill {
+                    LabeledContent("Workout", value: prefill.title)
+                } else {
+                    Picker("Type", selection: $type) {
+                        Text("Strength").tag(WorkoutType.strength)
+                        Text("Mobility").tag(WorkoutType.mobility)
+                        Text("Easy run").tag(WorkoutType.easy)
+                    }
                 }
                 DatePicker("When", selection: $date, in: ...Date.now, displayedComponents: [.date])
                 Stepper("\(minutes) minutes", value: $minutes, in: 5...240, step: 5)
@@ -347,7 +378,7 @@ struct LogActivityView: View {
                 ToolbarItem(placement: .cancellationAction) { Button("Cancel") { dismiss() } }
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Save") {
-                        let planned = store.plan?.day(on: date)?.workouts.first { $0.type == type && !store.isCompleted($0) }
+                        let planned = prefill ?? store.plan?.day(on: date)?.workouts.first { $0.type == type && !store.isCompleted($0) }
                         store.record(ActivityRecord(date: date, type: type, plannedWorkoutID: planned?.id, durationSeconds: TimeInterval(minutes * 60), meters: Units.meters(miles: miles), notes: notes))
                         dismiss()
                     }

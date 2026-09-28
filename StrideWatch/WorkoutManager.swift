@@ -38,6 +38,8 @@ final class WorkoutManager: NSObject {
     private let healthStore = HKHealthStore()
     private var session: HKWorkoutSession?
     private var builder: HKLiveWorkoutBuilder?
+    /// Collects GPS fixes so the run shows a map in Fitness / Health.
+    private var routeBuilder: HKWorkoutRouteBuilder?
 
     // Location — a second, independent distance source that works in more places.
     private let locationManager = CLLocationManager()
@@ -91,6 +93,7 @@ final class WorkoutManager: NSObject {
     func requestAuthorization() async {
         guard HKHealthStore.isHealthDataAvailable() else { return }
         let share: Set<HKSampleType> = [HKObjectType.workoutType(),
+                                        HKSeriesType.workoutRoute(),
                                         HKQuantityType(.distanceWalkingRunning),
                                         HKQuantityType(.activeEnergyBurned)]
         let read: Set<HKObjectType> = [HKQuantityType(.heartRate),
@@ -121,6 +124,7 @@ final class WorkoutManager: NSObject {
             builder.delegate = self
             self.session = session
             self.builder = builder
+            self.routeBuilder = HKWorkoutRouteBuilder(healthStore: healthStore, device: nil)
             session.startActivity(with: .now)
             builder.beginCollection(withStart: .now) { _, _ in }
         } catch {
@@ -197,8 +201,16 @@ final class WorkoutManager: NSObject {
         completed = record
 
         session?.end()
+        let routeBuilder = self.routeBuilder
         builder?.endCollection(withEnd: .now) { [weak self] _, _ in
-            self?.builder?.finishWorkout { _, _ in }
+            self?.builder?.finishWorkout { workout, _ in
+                // Attach the route once the workout exists in Health.
+                if let workout {
+                    routeBuilder?.finishRoute(with: workout, metadata: nil) { _, _ in }
+                } else {
+                    routeBuilder?.discard()
+                }
+            }
         }
         WKInterfaceDevice.current().play(.success)
     }
@@ -238,6 +250,7 @@ final class WorkoutManager: NSObject {
         lastAlert = .distantPast
         session = nil
         builder = nil
+        routeBuilder = nil
     }
 
     // MARK: - Every second
@@ -410,12 +423,16 @@ extension WorkoutManager: CLLocationManagerDelegate {
                 return
             }
             guard phase == .running else { return }
-            for loc in locations where loc.horizontalAccuracy >= 0 && loc.horizontalAccuracy < 30 {
+            let good = locations.filter { $0.horizontalAccuracy >= 0 && $0.horizontalAccuracy < 30 }
+            for loc in good {
                 if let last = lastLocation {
                     let d = loc.distance(from: last)
                     if d > 1 { gpsDistance += d }
                 }
                 lastLocation = loc
+            }
+            if !good.isEmpty {
+                routeBuilder?.insertRouteData(good) { _, _ in }
             }
         }
     }

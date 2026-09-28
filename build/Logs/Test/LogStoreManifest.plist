@@ -6,69 +6,10 @@
 	<integer>13</integer>
 	<key>logs</key>
 	<dict>
-		<key>149FE915-AFFD-405B-B7E1-D2E2ABA4BE20</key>
+		<key>83E3134F-45A0-4705-AEB3-0EC474D87A66</key>
 		<dict>
 			<key>auxiliaryLogUniqueIdentifier</key>
-			<string>D04A6C86-5738-4B80-A4E9-D72996727D65</string>
-			<key>auxiliaryObservable</key>
-			<dict>
-				<key>highLevelStatus</key>
-				<string>E</string>
-				<key>totalNumberOfAnalyzerIssues</key>
-				<integer>0</integer>
-				<key>totalNumberOfErrors</key>
-				<integer>1</integer>
-				<key>totalNumberOfTestFailures</key>
-				<integer>0</integer>
-				<key>totalNumberOfWarnings</key>
-				<integer>1</integer>
-			</dict>
-			<key>className</key>
-			<string>IDESchemeActionsInvocationRecord</string>
-			<key>documentTypeString</key>
-			<string>&lt;nil&gt;</string>
-			<key>domainType</key>
-			<string>com.apple.dt.unit.cocoaUnitTest</string>
-			<key>fileName</key>
-			<string>Test-Stride-2026.09.28_08-47-20--0500.xcresult</string>
-			<key>hasAuxiliaryLog</key>
-			<true/>
-			<key>hasPrimaryLog</key>
-			<true/>
-			<key>primaryObservable</key>
-			<dict>
-				<key>highLevelStatus</key>
-				<string>E</string>
-				<key>totalNumberOfAnalyzerIssues</key>
-				<integer>0</integer>
-				<key>totalNumberOfErrors</key>
-				<integer>2</integer>
-				<key>totalNumberOfTestFailures</key>
-				<integer>0</integer>
-				<key>totalNumberOfWarnings</key>
-				<integer>1</integer>
-			</dict>
-			<key>schemeIdentifier-containerName</key>
-			<string>Stride project</string>
-			<key>schemeIdentifier-schemeName</key>
-			<string>Stride</string>
-			<key>schemeIdentifier-sharedScheme</key>
-			<integer>1</integer>
-			<key>signature</key>
-			<string>Test Stride</string>
-			<key>timeStartedRecording</key>
-			<real>812296040.529163</real>
-			<key>timeStoppedRecording</key>
-			<real>812296041.67867696</real>
-			<key>title</key>
-			<string>Test Stride</string>
-			<key>uniqueIdentifier</key>
-			<string>149FE915-AFFD-405B-B7E1-D2E2ABA4BE20</string>
-		</dict>
-		<key>1AFC1996-4309-4709-B299-37B08C98DE06</key>
-		<dict>
-			<key>auxiliaryLogUniqueIdentifier</key>
-			<string>4785BDA8-7210-4ED7-9867-F93717F14D0B</string>
+			<string>97FA709B-BDDC-4D48-AF5E-3735CCB41ACC</string>
 			<key>auxiliaryObservable</key>
 			<dict>
 				<key>highLevelStatus</key>
@@ -80,7 +21,7 @@
 				<key>totalNumberOfTestFailures</key>
 				<integer>0</integer>
 				<key>totalNumberOfWarnings</key>
-				<integer>2</integer>
+				<integer>4</integer>
 			</dict>
 			<key>className</key>
 			<string>IDESchemeActionsInvocationRecord</string>
@@ -89,7 +30,7 @@
 			<key>domainType</key>
 			<string>com.apple.dt.unit.cocoaUnitTest</string>
 			<key>fileName</key>
-			<string>Test-Stride-2026.09.28_08-47-38--0500.xcresult</string>
+			<string>Test-Stride-2026.09.28_08-58-06--0500.xcresult</string>
 			<key>hasAuxiliaryLog</key>
 			<true/>
 			<key>hasPrimaryLog</key>
@@ -105,7 +46,7 @@
 				<key>totalNumberOfTestFailures</key>
 				<integer>0</integer>
 				<key>totalNumberOfWarnings</key>
-				<integer>1</integer>
+				<integer>2</integer>
 			</dict>
 			<key>schemeIdentifier-containerName</key>
 			<string>Stride project</string>
@@ -116,13 +57,13 @@
 			<key>signature</key>
 			<string>Test Stride</string>
 			<key>timeStartedRecording</key>
-			<real>812296058.72704196</real>
+			<real>812296686.03540897</real>
 			<key>timeStoppedRecording</key>
-			<real>812296095.06132102</real>
+			<real>812296704.23755896</real>
 			<key>title</key>
 			<string>Test Stride</string>
 			<key>uniqueIdentifier</key>
-			<string>1AFC1996-4309-4709-B299-37B08C98DE06</string>
+			<string>83E3134F-45A0-4705-AEB3-0EC474D87A66</string>
 		</dict>
 		<key>D668F041-CFC0-4A16-BD3C-C1EC1BD9CEEE</key>
 		<dict>
