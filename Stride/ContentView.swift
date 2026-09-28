@@ -123,6 +123,23 @@ struct SettingsView: View {
                 }
 
                 Section {
+                    ForEach(RoutineLibrary.all) { routine in
+                        NavigationLink {
+                            RoutineView(routine: routine)
+                        } label: {
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text(routine.title)
+                                Text("\(routine.minutes) min · \(routine.exercises.count) moves").font(.caption).foregroundStyle(.secondary)
+                            }
+                        }
+                    }
+                } header: {
+                    Text("Warm-ups, cool-downs & mobility")
+                } footer: {
+                    Text("Every run links to the right ones automatically; this is the whole library for rest days.")
+                }
+
+                Section {
                     Button("Sync plan to watch") { Connectivity.shared.send(plan: store.plan) }
                     Button("Start over", role: .destructive) { showReset = true }
                 }

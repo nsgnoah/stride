@@ -204,7 +204,9 @@ struct PlanGenerator {
     // MARK: - Workouts
 
     private func strengthDay() -> Workout {
-        Workout(type: .strength, title: "Lift", summary: "Your strength day. Runs are scheduled around it.")
+        Workout(type: .strength, title: "Lift",
+                summary: "Your strength day. Runs are scheduled around it. No program of your own? Runner Strength below takes 15 minutes.",
+                standaloneRoutineID: RoutineLibrary.runnerStrength.id)
     }
 
     private func restOrMobility(weekday: Weekday, schedule: [Weekday: WorkoutType]) -> Workout {

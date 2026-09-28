@@ -21,6 +21,19 @@ struct TodayView: View {
                     }
                 }
 
+                if store.activities.isEmpty {
+                    Section {
+                        VStack(alignment: .leading, spacing: 8) {
+                            Label("Getting started", systemImage: "applewatch").font(.headline)
+                            Text("Your plan is on your Apple Watch too — open Stride there and tap Start on run day. It walks you through the warm-up, coaches your pace, and sends the run back here.")
+                            Text("Lifts and mobility can be checked off from the watch or from the day's screen here.")
+                                .foregroundStyle(.secondary)
+                        }
+                        .font(.subheadline)
+                        .padding(.vertical, 4)
+                    }
+                }
+
                 if let today = store.today {
                     Section("Today") {
                         ForEach(today.workouts) { workout in
