@@ -1,0 +1,72 @@
+name: Stride
+options:
+  bundleIdPrefix: co.nsgsolutions
+  deploymentTarget:
+    iOS: "18.0"
+    watchOS: "11.0"
+  createIntermediateGroups: true
+  generateEmptyDirectories: true
+
+settings:
+  base:
+    SWIFT_VERSION: "6.0"
+    SWIFT_STRICT_CONCURRENCY: minimal
+    DEVELOPMENT_TEAM: 23FZ6AFC22
+    CODE_SIGN_STYLE: Automatic
+    MARKETING_VERSION: "0.1.0"
+    CURRENT_PROJECT_VERSION: "1"
+
+targets:
+  Stride:
+    type: application
+    platform: iOS
+    sources:
+      - path: Stride
+      - path: Shared
+    dependencies:
+      - target: StrideWatch
+    entitlements:
+      path: Stride/Stride.entitlements
+      properties:
+        com.apple.developer.healthkit: true
+        com.apple.developer.healthkit.access: []
+    info:
+      path: Stride/Info.plist
+      properties:
+        CFBundleDisplayName: Stride
+        UILaunchScreen: {}
+        UISupportedInterfaceOrientations: [UIInterfaceOrientationPortrait]
+        NSHealthShareUsageDescription: Stride reads your runs so it can chart your progress.
+        NSHealthUpdateUsageDescription: Stride saves runs you record from your watch to Health.
+        WKCompanionAppBundleIdentifier: co.nsgsolutions.Stride
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: co.nsgsolutions.Stride
+        TARGETED_DEVICE_FAMILY: "1"
+
+  StrideWatch:
+    type: application
+    platform: watchOS
+    sources:
+      - path: StrideWatch
+      - path: Shared
+    entitlements:
+      path: StrideWatch/StrideWatch.entitlements
+      properties:
+        com.apple.developer.healthkit: true
+        com.apple.developer.healthkit.access: []
+    info:
+      path: StrideWatch/Info.plist
+      properties:
+        CFBundleDisplayName: Stride
+        WKApplication: true
+        WKCompanionAppBundleIdentifier: co.nsgsolutions.Stride
+        WKRunsIndependentlyOfCompanionApp: true
+        WKBackgroundModes: [workout-processing]
+        NSHealthShareUsageDescription: Stride reads heart rate and distance during your run to coach your pace.
+        NSHealthUpdateUsageDescription: Stride saves your runs as workouts in Health.
+        NSLocationWhenInUseUsageDescription: Stride uses GPS to measure your distance and pace while you run.
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: co.nsgsolutions.Stride.watchkitapp
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
