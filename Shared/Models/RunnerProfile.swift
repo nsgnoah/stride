@@ -31,6 +31,8 @@ struct ActivityRecord: Codable, Hashable, Identifiable, Sendable {
     var averageHeartRate: Double?
     var splits: [Split] = []
     var notes: String = ""
+    /// Set when the record was imported from a workout in Apple Health (not recorded by Stride).
+    var healthKitID: UUID?
 
     var averagePace: Pace? {
         guard meters > 0 else { return nil }

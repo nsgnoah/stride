@@ -86,6 +86,15 @@ struct SplitsChart: View {
     let splits: [ActivityRecord.Split]
     let target: PaceRange?
 
+    /// Minutes-per-mile window that frames both the splits and the target, with headroom.
+    private var yDomain: ClosedRange<Double> {
+        var values = splits.map(\.seconds)
+        if let target { values += [target.fast, target.slow] }
+        let lo = (values.min() ?? 0) - 45
+        let hi = (values.max() ?? 0) + 60
+        return (lo / 60)...(hi / 60)
+    }
+
     var body: some View {
         Chart {
             if let target {
@@ -93,14 +102,16 @@ struct SplitsChart: View {
                     .foregroundStyle(.green.opacity(0.12))
             }
             ForEach(splits, id: \.mile) { split in
-                BarMark(x: .value("Mile", split.mile), y: .value("Pace", split.seconds / 60))
+                BarMark(x: .value("Mile", split.mile), yStart: .value("Floor", yDomain.lowerBound), yEnd: .value("Pace", split.seconds / 60), width: .ratio(0.55))
                     .foregroundStyle(color(for: split.seconds))
+                    .cornerRadius(4)
                     .annotation(position: .top) {
                         Text(Pace(split.seconds).formatted).font(.caption2).foregroundStyle(.secondary)
                     }
             }
         }
-        .chartYScale(domain: .automatic(includesZero: false))
+        .chartYScale(domain: yDomain)
+        .chartXScale(domain: 0.4...(Double(splits.count) + 0.6))
         .chartYAxis {
             AxisMarks { value in
                 AxisGridLine()

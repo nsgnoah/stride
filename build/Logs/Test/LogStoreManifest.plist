@@ -124,22 +124,22 @@
 			<key>uniqueIdentifier</key>
 			<string>780FCA44-352C-472C-BA41-49C7FEE7703F</string>
 		</dict>
-		<key>A9490796-3AF7-4B89-987D-FF9989BBA80A</key>
+		<key>812723FE-5A53-4CC2-9F28-142845FAFED2</key>
 		<dict>
 			<key>auxiliaryLogUniqueIdentifier</key>
-			<string>E5174302-8E84-4304-A47E-F7EF853C980F</string>
+			<string>A9C4D409-A6E0-49F6-9CA9-28388F807685</string>
 			<key>auxiliaryObservable</key>
 			<dict>
 				<key>highLevelStatus</key>
-				<string>E</string>
+				<string>W</string>
 				<key>totalNumberOfAnalyzerIssues</key>
 				<integer>0</integer>
 				<key>totalNumberOfErrors</key>
+				<integer>0</integer>
+				<key>totalNumberOfTestFailures</key>
+				<integer>0</integer>
+				<key>totalNumberOfWarnings</key>
 				<integer>2</integer>
-				<key>totalNumberOfTestFailures</key>
-				<integer>0</integer>
-				<key>totalNumberOfWarnings</key>
-				<integer>0</integer>
 			</dict>
 			<key>className</key>
 			<string>IDESchemeActionsInvocationRecord</string>
@@ -148,7 +148,7 @@
 			<key>domainType</key>
 			<string>com.apple.dt.unit.cocoaUnitTest</string>
 			<key>fileName</key>
-			<string>Test-Stride-2026.09.28_08-22-44--0500.xcresult</string>
+			<string>Test-Stride-2026.09.28_08-32-36--0500.xcresult</string>
 			<key>hasAuxiliaryLog</key>
 			<true/>
 			<key>hasPrimaryLog</key>
@@ -156,41 +156,7 @@
 			<key>primaryObservable</key>
 			<dict>
 				<key>highLevelStatus</key>
-				<string>E</string>
-				<key>totalNumberOfAnalyzerIssues</key>
-				<integer>0</integer>
-				<key>totalNumberOfErrors</key>
-				<integer>3</integer>
-				<key>totalNumberOfTestFailures</key>
-				<integer>0</integer>
-				<key>totalNumberOfWarnings</key>
-				<integer>0</integer>
-			</dict>
-			<key>schemeIdentifier-containerName</key>
-			<string>Stride project</string>
-			<key>schemeIdentifier-schemeName</key>
-			<string>Stride</string>
-			<key>schemeIdentifier-sharedScheme</key>
-			<integer>1</integer>
-			<key>signature</key>
-			<string>Test Stride</string>
-			<key>timeStartedRecording</key>
-			<real>812294564.17750394</real>
-			<key>timeStoppedRecording</key>
-			<real>812294577.08698595</real>
-			<key>title</key>
-			<string>Test Stride</string>
-			<key>uniqueIdentifier</key>
-			<string>A9490796-3AF7-4B89-987D-FF9989BBA80A</string>
-		</dict>
-		<key>F4102EC7-EE5B-49C7-BE79-C49CA0C22584</key>
-		<dict>
-			<key>auxiliaryLogUniqueIdentifier</key>
-			<string>DF652388-5337-4720-A198-BDBD00AB1994</string>
-			<key>auxiliaryObservable</key>
-			<dict>
-				<key>highLevelStatus</key>
-				<string>S</string>
+				<string>W</string>
 				<key>totalNumberOfAnalyzerIssues</key>
 				<integer>0</integer>
 				<key>totalNumberOfErrors</key>
@@ -198,32 +164,7 @@
 				<key>totalNumberOfTestFailures</key>
 				<integer>0</integer>
 				<key>totalNumberOfWarnings</key>
-				<integer>0</integer>
-			</dict>
-			<key>className</key>
-			<string>IDESchemeActionsInvocationRecord</string>
-			<key>documentTypeString</key>
-			<string>&lt;nil&gt;</string>
-			<key>domainType</key>
-			<string>com.apple.dt.unit.cocoaUnitTest</string>
-			<key>fileName</key>
-			<string>Test-Stride-2026.09.28_08-23-13--0500.xcresult</string>
-			<key>hasAuxiliaryLog</key>
-			<true/>
-			<key>hasPrimaryLog</key>
-			<true/>
-			<key>primaryObservable</key>
-			<dict>
-				<key>highLevelStatus</key>
-				<string>T</string>
-				<key>totalNumberOfAnalyzerIssues</key>
-				<integer>0</integer>
-				<key>totalNumberOfErrors</key>
-				<integer>0</integer>
-				<key>totalNumberOfTestFailures</key>
 				<integer>1</integer>
-				<key>totalNumberOfWarnings</key>
-				<integer>0</integer>
 			</dict>
 			<key>schemeIdentifier-containerName</key>
 			<string>Stride project</string>
@@ -234,13 +175,13 @@
 			<key>signature</key>
 			<string>Test Stride</string>
 			<key>timeStartedRecording</key>
-			<real>812294593.06420898</real>
+			<real>812295156.48489201</real>
 			<key>timeStoppedRecording</key>
-			<real>812294673.40375304</real>
+			<real>812295182.79048705</real>
 			<key>title</key>
 			<string>Test Stride</string>
 			<key>uniqueIdentifier</key>
-			<string>F4102EC7-EE5B-49C7-BE79-C49CA0C22584</string>
+			<string>812723FE-5A53-4CC2-9F28-142845FAFED2</string>
 		</dict>
 	</dict>
 </dict>

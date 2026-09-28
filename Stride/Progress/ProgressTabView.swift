@@ -3,6 +3,7 @@ import Charts
 
 struct ProgressTabView: View {
     @Environment(AppStore.self) private var store
+    @State private var importMessage: String?
 
     var body: some View {
         NavigationStack {
@@ -34,7 +35,7 @@ struct ProgressTabView: View {
                     }
                 }
 
-                Section("History") {
+                Section {
                     if store.activities.isEmpty {
                         Text("Runs from the watch show up here.").foregroundStyle(.secondary)
                     }
@@ -43,6 +44,26 @@ struct ProgressTabView: View {
                     }
                     .onDelete { offsets in
                         for i in offsets { store.delete(store.activities[i]) }
+                    }
+                } header: {
+                    Text("History")
+                } footer: {
+                    if let importMessage { Text(importMessage) }
+                }
+
+                if HealthImporter.isAvailable {
+                    Section {
+                        Button {
+                            Task {
+                                guard await HealthImporter.requestPermission() else { importMessage = "Health access is off for Stride."; return }
+                                let n = await HealthImporter.importRuns(into: store)
+                                importMessage = n == 0 ? "No new runs in Health." : "Imported \(n) run\(n == 1 ? "" : "s") from Health."
+                            }
+                        } label: {
+                            Label("Import runs from Health", systemImage: "heart.text.square")
+                        }
+                    } footer: {
+                        Text("Runs recorded with the Workout app or another tracker count toward the plan too.")
                     }
                 }
             }

@@ -3,6 +3,7 @@ import SwiftUI
 @main
 struct StrideApp: App {
     @State private var store = AppStore()
+    @Environment(\.scenePhase) private var scenePhase
 
     var body: some Scene {
         WindowGroup {
@@ -11,6 +12,13 @@ struct StrideApp: App {
                 .task {
                     Connectivity.shared.store = store
                     Connectivity.shared.activate()
+                }
+                .onChange(of: scenePhase) { _, phase in
+                    // Pick up runs she logged elsewhere whenever the app comes forward.
+                    // Only after she has granted access once (from Progress), never a cold prompt.
+                    if phase == .active, store.plan != nil {
+                        Task { await HealthImporter.importRuns(into: store) }
+                    }
                 }
                 .onChange(of: store.plan) { _, plan in
                     Connectivity.shared.send(plan: plan)
