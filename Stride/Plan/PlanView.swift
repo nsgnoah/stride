@@ -4,10 +4,22 @@ import SwiftUI
 struct PlanView: View {
     @Environment(AppStore.self) private var store
     @State private var expanded: Set<UUID> = []
+    @State private var buildingPlan = false
 
     var body: some View {
         NavigationStack {
             List {
+                if store.plan == nil {
+                    Section {
+                        VStack(alignment: .leading, spacing: 8) {
+                            Text("No plan yet").font(.headline)
+                            Text("You're tracking runs without a schedule. A plan lays out each week around your goal and lifting days, with warm-ups, cool-downs and pace targets on the watch.")
+                                .font(.subheadline).foregroundStyle(.secondary)
+                        }
+                        .padding(.vertical, 4)
+                        Button("Build a training plan…") { buildingPlan = true }
+                    }
+                }
                 if let plan = store.plan {
                     Section {
                         HStack {
@@ -44,6 +56,7 @@ struct PlanView: View {
                 }
             }
             .navigationTitle("Plan")
+            .sheet(isPresented: $buildingPlan) { PlanSetupView() }
             .navigationDestination(for: Workout.self) { WorkoutDetailView(workout: $0) }
             .onAppear {
                 if let current = store.thisWeek { expanded.insert(current.id) }

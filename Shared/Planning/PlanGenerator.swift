@@ -51,7 +51,8 @@ struct PlanGenerator {
             let isRaceWeek = index == totalWeeks - 1
             let isBase = index < 2
             let isTaper = !isRaceWeek && index >= totalWeeks - 1 - taperWeeks && totalWeeks > 6
-            let quality: WorkoutType? = (isBase || isRaceWeek) ? nil : (index % 2 == 0 ? .intervals : .tempo)
+            // One run a week is just the long run; speed work needs at least two days.
+            let quality: WorkoutType? = (isBase || isRaceWeek || runner.runDaysPerWeek < 2) ? nil : (index % 2 == 0 ? .intervals : .tempo)
 
             let schedule = daySchedule(quality: quality, isRaceWeek: isRaceWeek)
             let days = Weekday.ordered.map { weekday -> PlannedDay in
@@ -96,7 +97,10 @@ struct PlanGenerator {
     /// Weekly mileage target per week.
     private func weeklyVolumes(weeks: Int) -> [Double] {
         let days = Double(runner.runDaysPerWeek)
-        let start = max(runner.currentWeeklyMiles, 3 * days)
+        var start = max(runner.currentWeeklyMiles, 3 * days)
+        // Few run days means few places to put the miles: don't pour a whole week's
+        // volume into one or two runs just because she used to spread it over more.
+        if runner.runDaysPerWeek < 3 { start = min(start, 5 * days) }
         let peakCap: Double = switch runner.goal {
         case .fiveK: 12 + 3 * days
         case .tenK: 16 + 4 * days
@@ -134,7 +138,7 @@ struct PlanGenerator {
         if isRaceWeek {
             schedule[raceDay] = .race
             // Shakeout the day before, unless the race is Monday (that day is last week).
-            if raceDay.index >= 1 {
+            if raceDay.index >= 1, runner.runDaysPerWeek >= 2 {
                 schedule[Weekday.ordered[raceDay.index - 1]] = .shakeout
             }
             var easyDays = runner.runDaysPerWeek - 2
@@ -226,7 +230,11 @@ struct PlanGenerator {
     private func workout(type: WorkoutType, weekMiles: Double, paces: PaceProfile, weekIndex: Int, totalWeeks: Int, quality: WorkoutType?, isTaper: Bool, isRaceWeek: Bool = false) -> Workout {
         let runDays = Double(runner.runDaysPerWeek)
         // Marathon long runs carry a bigger share of the week; that's the whole point of the build.
-        let longShare: Double = runner.goal == .marathon ? 0.45 : (runDays <= 3 ? 0.4 : 0.33)
+        let longShare: Double = switch runner.runDaysPerWeek {
+        case 1: 1.0          // the one run is the week
+        case 2: 0.6
+        default: runner.goal == .marathon ? 0.45 : (runDays <= 3 ? 0.4 : 0.33)
+        }
         let longMiles = min(weekMiles * longShare, runner.goal.longRunCapMiles)
         let progress = Double(weekIndex) / Double(max(1, totalWeeks - 1))
         // Speed work shrinks in the taper so the week's total actually drops.

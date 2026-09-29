@@ -35,6 +35,23 @@ struct ProgressTabView: View {
                     }
                 }
 
+                if store.plan == nil {
+                    let week = store.activitiesThisCalendarWeek
+                    Section("This week") {
+                        LabeledContent("Runs", value: "\(week.filter { $0.type.isRun }.count)")
+                        LabeledContent("Miles", value: Formatting.miles(week.reduce(0) { $0 + $1.meters }, decimals: 1))
+                        LabeledContent("Lifts", value: "\(week.filter { $0.type == .strength }.count)")
+                        LabeledContent("Time moving", value: Formatting.duration(week.reduce(0) { $0 + $1.durationSeconds }))
+                    }
+                    if runs.count >= 2 {
+                        Section("Pace over time") {
+                            PaceChart(runs: runs, easyRange: nil)
+                                .frame(height: 200)
+                                .padding(.vertical, 8)
+                        }
+                    }
+                }
+
                 Section {
                     if store.activities.isEmpty {
                         Text("Runs from the watch show up here.").foregroundStyle(.secondary)
@@ -106,12 +123,14 @@ struct MileageChart: View {
 
 struct PaceChart: View {
     let runs: [ActivityRecord]
-    let easyRange: PaceRange
+    let easyRange: PaceRange?
 
     var body: some View {
         Chart {
-            RectangleMark(yStart: .value("Fast", easyRange.fast / 60), yEnd: .value("Slow", easyRange.slow / 60))
-                .foregroundStyle(.green.opacity(0.12))
+            if let easyRange {
+                RectangleMark(yStart: .value("Fast", easyRange.fast / 60), yEnd: .value("Slow", easyRange.slow / 60))
+                    .foregroundStyle(.green.opacity(0.12))
+            }
             ForEach(runs) { run in
                 if let pace = run.averagePace {
                     LineMark(x: .value("Date", run.date), y: .value("Pace", pace / 60))

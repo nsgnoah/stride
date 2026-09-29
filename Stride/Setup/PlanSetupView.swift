@@ -43,6 +43,21 @@ struct PlanSetupView: View {
     var body: some View {
         NavigationStack {
             Form {
+                if !isEditing && !startFresh && store.plan == nil && !store.freeMode {
+                    Section {
+                        VStack(alignment: .leading, spacing: 6) {
+                            Text("Just want to run?").font(.headline)
+                            Text("Skip the plan. Open Stride on your watch, tap Free run, and your runs, pace and splits are tracked here. You can build a plan any time.")
+                                .font(.subheadline).foregroundStyle(.secondary)
+                        }
+                        .padding(.vertical, 2)
+                        Button("Skip the plan — just track my runs") {
+                            store.setFreeMode(true)
+                            dismiss()
+                        }
+                    }
+                }
+
                 Section {
                     Picker("Goal distance", selection: $profile.goal) {
                         ForEach(GoalDistance.allCases) { Text($0.name).tag($0) }
@@ -62,7 +77,13 @@ struct PlanSetupView: View {
                 }
 
                 Section("Your week") {
-                    Stepper("Run \(profile.runDaysPerWeek) days a week", value: $profile.runDaysPerWeek, in: 3...6)
+                    Stepper("Run \(profile.runDaysPerWeek) day\(profile.runDaysPerWeek == 1 ? "" : "s") a week", value: $profile.runDaysPerWeek, in: 1...6)
+                    if profile.runDaysPerWeek < 3 {
+                        Text(profile.runDaysPerWeek == 1
+                             ? "One run a week: a steady long run that grows gradually. Fine for staying in it; add a day when you want to build faster."
+                             : "Two runs a week: a long run plus an easy run, with some faster running mixed in after the first two weeks.")
+                            .font(.footnote).foregroundStyle(.secondary)
+                    }
                     VStack(alignment: .leading, spacing: 8) {
                         Text("Lifting days")
                         WeekdayPicker(selection: $profile.strengthDays)
@@ -119,7 +140,7 @@ struct PlanSetupView: View {
             }
             .navigationTitle(isEditing ? "Adjust Plan" : "Stride")
             .toolbar {
-                if isEditing || startFresh {
+                if isEditing || startFresh || store.freeMode {
                     ToolbarItem(placement: .cancellationAction) { Button("Cancel") { dismiss() } }
                 }
                 ToolbarItem(placement: .confirmationAction) {

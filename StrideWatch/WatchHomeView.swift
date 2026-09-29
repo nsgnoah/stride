@@ -31,8 +31,8 @@ struct WatchHomeView: View {
                             }
                         }
                     } else if store.plan == nil {
-                        Text("Build a plan on your iPhone and it'll show up here.")
-                            .foregroundStyle(.secondary)
+                        Text("No plan — just run. Free run tracks pace, distance and mile splits.")
+                            .font(.footnote).foregroundStyle(.secondary)
                     } else {
                         Text("All planned runs done. Nice.").foregroundStyle(.secondary)
                     }

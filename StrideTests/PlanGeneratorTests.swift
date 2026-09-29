@@ -33,7 +33,7 @@ struct PlanGeneratorTests {
     static var grid: [RunnerProfile] {
         var out: [RunnerProfile] = []
         for goal in GoalDistance.allCases {
-            for days in 3...6 {
+            for days in 1...6 {
                 for lifts in [Set<Weekday>(), [.monday, .thursday], [.tuesday, .friday], [.monday, .wednesday, .friday]] {
                     out.append(profile(goal: goal, days: days, lifts: lifts, weeks: goal.defaultWeeks))
                 }
@@ -118,6 +118,24 @@ struct PlanGeneratorTests {
     static func freeDays(_ p: RunnerProfile) -> Set<Weekday> {
         let after = Set(p.strengthDays.map { Weekday.ordered[($0.index + 1) % 7] })
         return Set(Weekday.ordered).subtracting(p.strengthDays).subtracting(after)
+    }
+
+    @Test func oneDayAWeekIsJustTheLongRun() {
+        let plan = Self.plan(Self.profile(days: 1))
+        for week in plan.weeks.dropLast() {
+            let runs = week.days.flatMap(\.workouts).filter { $0.type.isRun }
+            #expect(runs.map(\.type) == [.long], "week \(week.number)")
+        }
+        let raceWeekRuns = plan.weeks.last!.days.flatMap(\.workouts).filter { $0.type.isRun }
+        #expect(raceWeekRuns.map(\.type) == [.race])
+    }
+
+    @Test func twoDaysAWeekAlwaysKeepsTheLongRun() {
+        let plan = Self.plan(Self.profile(days: 2, lifts: [.monday, .thursday]))
+        for week in plan.weeks.dropLast() {
+            let types = week.days.flatMap(\.workouts).filter { $0.type.isRun }.map(\.type)
+            #expect(types.count == 2 && types.contains(.long), "week \(week.number): \(types)")
+        }
     }
 
     @Test func firstTwoWeeksAreAllEasy() {

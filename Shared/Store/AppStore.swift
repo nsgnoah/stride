@@ -13,6 +13,14 @@ final class AppStore {
     /// Hour of the morning reminder on run days; nil when reminders are off.
     /// Set via `setReminderHour` so loading a snapshot never triggers a save.
     private(set) var reminderHour: Int?
+    /// She chose to skip the plan and just track runs. Cleared when a plan is built.
+    private(set) var freeMode: Bool = false
+
+    func setFreeMode(_ on: Bool) {
+        freeMode = on
+        save()
+    }
+
     /// Spoken coaching on the watch (through connected headphones). On by default.
     private(set) var voiceCues: Bool = true
 
@@ -34,6 +42,7 @@ final class AppStore {
         var activities: [ActivityRecord]
         var reminderHour: Int?
         var voiceCues: Bool?
+        var freeMode: Bool?
     }
 
     /// Workout ids that no longer need a reminder.
@@ -69,6 +78,7 @@ final class AppStore {
         self.profile = profile
         let previous = fresh ? nil : plan
         var newPlan = PlanGenerator(runner: profile, startDate: previous?.startDate ?? .now).makePlan()
+        freeMode = false
         if let previous {
             newPlan.skipped = previous.skipped
             for (id, date) in previous.moves { newPlan.move(workoutID: id, to: date) }
@@ -113,6 +123,7 @@ final class AppStore {
     }
 
     func reset() {
+        freeMode = false
         profile = nil
         plan = nil
         activities = []
@@ -167,10 +178,16 @@ final class AppStore {
             }
     }
 
+    /// Activities since Monday of this calendar week — used when there's no plan.
+    var activitiesThisCalendarWeek: [ActivityRecord] {
+        let start = PlanGenerator.startOfWeek(.now)
+        return activities.filter { $0.date >= start }
+    }
+
     // MARK: - Persistence
 
     func save() {
-        let snap = Snapshot(profile: profile, plan: plan, activities: activities, reminderHour: reminderHour, voiceCues: voiceCues)
+        let snap = Snapshot(profile: profile, plan: plan, activities: activities, reminderHour: reminderHour, voiceCues: voiceCues, freeMode: freeMode)
         do {
             let data = try JSONEncoder().encode(snap)
             try data.write(to: url, options: .atomic)
@@ -188,5 +205,6 @@ final class AppStore {
         activities = snap.activities
         reminderHour = snap.reminderHour
         voiceCues = snap.voiceCues ?? true
+        freeMode = snap.freeMode ?? false
     }
 }

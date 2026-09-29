@@ -4,6 +4,7 @@ struct TodayView: View {
     @Environment(AppStore.self) private var store
     @State private var loggingLift = false
     @State private var buildingNext = false
+    @State private var buildingPlan = false
 
     var body: some View {
         NavigationStack {
@@ -21,7 +22,24 @@ struct TodayView: View {
                     }
                 }
 
-                if store.activities.isEmpty {
+                if store.plan == nil {
+                    Section {
+                        VStack(alignment: .leading, spacing: 8) {
+                            Label("Free run mode", systemImage: "figure.run").font(.headline)
+                            Text("No schedule — run when you like. On your watch, open Stride and tap Free run. Every run shows up here with pace and mile splits.")
+                                .font(.subheadline)
+                        }
+                        .padding(.vertical, 4)
+                        let week = store.activitiesThisCalendarWeek.filter { $0.type.isRun }
+                        LabeledContent("This week", value: "\(week.count) run\(week.count == 1 ? "" : "s") · \(Formatting.miles(week.reduce(0) { $0 + $1.meters }, decimals: 1))")
+                        Button("Build a training plan…") { buildingPlan = true }
+                    }
+                    if let last = store.activities.first(where: { $0.type.isRun }) {
+                        Section("Last run") {
+                            NavigationLink(value: last) { ActivityRow(activity: last) }
+                        }
+                    }
+                } else if store.activities.isEmpty {
                     Section {
                         VStack(alignment: .leading, spacing: 8) {
                             Label("Getting started", systemImage: "applewatch").font(.headline)
@@ -86,6 +104,8 @@ struct TodayView: View {
             .navigationTitle("Today")
             .navigationDestination(for: Workout.self) { WorkoutDetailView(workout: $0) }
             .sheet(isPresented: $loggingLift) { LogActivityView() }
+            .sheet(isPresented: $buildingPlan) { PlanSetupView() }
+            .navigationDestination(for: ActivityRecord.self) { ActivityDetailView(activity: $0) }
             .sheet(isPresented: $buildingNext) {
                 NavigationStack {
                     PlanSetupView(existing: store.profile, startFresh: true,

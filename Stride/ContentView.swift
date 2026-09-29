@@ -4,7 +4,7 @@ struct ContentView: View {
     @Environment(AppStore.self) private var store
 
     var body: some View {
-        if store.plan == nil {
+        if store.plan == nil && !store.freeMode {
             PlanSetupView()
         } else {
             TabView {
@@ -61,6 +61,15 @@ struct SettingsView: View {
     var body: some View {
         NavigationStack {
             List {
+                if store.plan == nil {
+                    Section {
+                        Button("Build a training plan…") { editing = true }
+                    } header: {
+                        Text("Plan")
+                    } footer: {
+                        Text("You're in free-run mode: no schedule, just tracking. A plan adds a weekly schedule and pace coaching on the watch.")
+                    }
+                }
                 if let profile = store.profile, let plan = store.plan {
                     Section("Plan") {
                         LabeledContent("Goal", value: plan.goal.name)
