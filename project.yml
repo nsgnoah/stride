@@ -13,7 +13,7 @@ settings:
     SWIFT_STRICT_CONCURRENCY: minimal
     DEVELOPMENT_TEAM: S6QW7SV228
     CODE_SIGN_STYLE: Automatic
-    MARKETING_VERSION: "0.1.0"
+    MARKETING_VERSION: "1.0"
     CURRENT_PROJECT_VERSION: "4"
 
 targets:
@@ -38,6 +38,8 @@ targets:
       path: Stride/Info.plist
       properties:
         CFBundleDisplayName: Stride
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
         UILaunchScreen: {}
         UISupportedInterfaceOrientations: [UIInterfaceOrientationPortrait]
         ITSAppUsesNonExemptEncryption: false
@@ -83,6 +85,8 @@ targets:
       path: StrideWatch/Info.plist
       properties:
         CFBundleDisplayName: Stride
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
         WKApplication: true
         WKCompanionAppBundleIdentifier: co.nsgsolutions.Stride
         WKRunsIndependentlyOfCompanionApp: true
@@ -112,6 +116,8 @@ targets:
       path: StrideWidget/Info.plist
       properties:
         CFBundleDisplayName: Stride
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
         NSExtension:
           NSExtensionPointIdentifier: com.apple.widgetkit-extension
     settings:
@@ -136,6 +142,8 @@ targets:
       path: StrideWatchWidget/Info.plist
       properties:
         CFBundleDisplayName: Stride
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
         NSExtension:
           NSExtensionPointIdentifier: com.apple.widgetkit-extension
     settings:
