@@ -279,6 +279,18 @@ struct PlanEditingTests {
         #expect(back == plan)
     }
 
+    @Test @MainActor func droppingThePlanKeepsLoggedRuns() {
+        let store = AppStore(filename: "stride-test-\(UUID().uuidString).json")
+        defer { store.reset() }
+        store.createPlan(from: PlanGeneratorTests.profile())
+        store.record(ActivityRecord(date: .now, type: .easy, durationSeconds: 1800, meters: 4800))
+        store.dropPlan()
+        #expect(store.plan == nil)
+        #expect(store.freeMode)
+        #expect(store.activities.count == 1)
+        #expect(store.profile != nil) // her schedule is kept for the next plan's setup
+    }
+
     @Test @MainActor func skippedRunsAreNeitherMissedNorNext() {
         let store = AppStore(filename: "stride-test-\(UUID().uuidString).json")
         defer { store.reset() }

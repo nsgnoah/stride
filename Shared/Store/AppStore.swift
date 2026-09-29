@@ -21,6 +21,19 @@ final class AppStore {
         save()
     }
 
+    /// Stop following the plan but keep every logged run. The app drops into free-run mode.
+    func dropPlan() {
+        plan = nil
+        freeMode = true
+        save()
+    }
+
+    /// Watch side of a plan being removed on the phone: forget the plan, keep local runs.
+    func clearPlan() {
+        plan = nil
+        save()
+    }
+
     /// Spoken coaching on the watch (through connected headphones). On by default.
     private(set) var voiceCues: Bool = true
 

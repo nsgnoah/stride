@@ -62,7 +62,7 @@ final class Connectivity: NSObject, WCSessionDelegate, @unchecked Sendable {
         guard let data = applicationContext[Key.plan] as? Data else { return }
         let plan = data.isEmpty ? nil : try? JSONDecoder().decode(TrainingPlan.self, from: data)
         Task { @MainActor in
-            if let plan { store?.replacePlan(plan) } else { store?.reset() }
+            if let plan { store?.replacePlan(plan) } else { store?.clearPlan() }
         }
     }
 

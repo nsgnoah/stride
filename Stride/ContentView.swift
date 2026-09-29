@@ -57,6 +57,7 @@ struct SettingsView: View {
     @State private var editing = false
     @State private var recalibrating: ActivityRecord?
     @State private var remindersDenied = false
+    @State private var confirmDrop = false
 
     var body: some View {
         NavigationStack {
@@ -77,6 +78,7 @@ struct SettingsView: View {
                         LabeledContent("Runs per week", value: "\(profile.runDaysPerWeek)")
                         LabeledContent("Lifting days", value: profile.strengthDays.isEmpty ? "None" : profile.strengthDays.sorted().map(\.shortName).joined(separator: ", "))
                         Button("Adjust plan…") { editing = true }
+                        Button("Stop following a plan", role: .destructive) { confirmDrop = true }
                     }
                     Section {
                         LabeledContent("Easy", value: plan.paces.easy.formatted)
@@ -162,6 +164,11 @@ struct SettingsView: View {
             .navigationTitle("Settings")
             .confirmationDialog("Delete the plan and all logged runs?", isPresented: $showReset, titleVisibility: .visible) {
                 Button("Delete everything", role: .destructive) { store.reset() }
+            }
+            .confirmationDialog("Stop following this plan?", isPresented: $confirmDrop, titleVisibility: .visible) {
+                Button("Stop the plan, keep my runs", role: .destructive) { store.dropPlan() }
+            } message: {
+                Text("The schedule goes away and Stride switches to free-run mode. Every run you've logged stays in Progress, and you can build a new plan any time.")
             }
             .sheet(isPresented: $editing) {
                 NavigationStack { PlanSetupView(existing: store.profile) }
