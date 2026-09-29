@@ -13,6 +13,13 @@ final class AppStore {
     /// Hour of the morning reminder on run days; nil when reminders are off.
     /// Set via `setReminderHour` so loading a snapshot never triggers a save.
     private(set) var reminderHour: Int?
+    /// Spoken coaching on the watch (through connected headphones). On by default.
+    private(set) var voiceCues: Bool = true
+
+    func setVoiceCues(_ on: Bool) {
+        voiceCues = on
+        save()
+    }
 
     func setReminderHour(_ hour: Int?) {
         reminderHour = hour
@@ -26,6 +33,7 @@ final class AppStore {
         var plan: TrainingPlan?
         var activities: [ActivityRecord]
         var reminderHour: Int?
+        var voiceCues: Bool?
     }
 
     /// Workout ids that no longer need a reminder.
@@ -162,7 +170,7 @@ final class AppStore {
     // MARK: - Persistence
 
     func save() {
-        let snap = Snapshot(profile: profile, plan: plan, activities: activities, reminderHour: reminderHour)
+        let snap = Snapshot(profile: profile, plan: plan, activities: activities, reminderHour: reminderHour, voiceCues: voiceCues)
         do {
             let data = try JSONEncoder().encode(snap)
             try data.write(to: url, options: .atomic)
@@ -179,5 +187,6 @@ final class AppStore {
         plan = snap.plan
         activities = snap.activities
         reminderHour = snap.reminderHour
+        voiceCues = snap.voiceCues ?? true
     }
 }

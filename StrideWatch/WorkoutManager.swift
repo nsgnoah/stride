@@ -31,6 +31,15 @@ final class WorkoutManager: NSObject {
     /// True while paused because she stopped moving (traffic light, shoelace). Resumes on its own.
     var autoPaused = false
     var autoPauseEnabled = true
+    /// Spoken cues through connected headphones; set from the store before `start`.
+    var voiceEnabled = true
+    private let voice = VoiceCoach()
+    private var lastVoiceAlert: Date = .distantPast
+
+    private func say(_ text: String) {
+        guard voiceEnabled else { return }
+        voice.speak(text)
+    }
     private var movingUpdates = 0
     private var countdownFired: Set<Int> = []
 
@@ -142,6 +151,13 @@ final class WorkoutManager: NSObject {
             Task { @MainActor in self?.tick() }
         }
         WKInterfaceDevice.current().play(.start)
+        if let first = workout.segments.first {
+            var line = "Starting \(workout.title). \(first.name), \(first.goalDescription)."
+            if let pace = first.pace { line += " Target \(VoiceCoach.spoken(pace))." }
+            say(line)
+        } else {
+            say("Starting \(workout.title).")
+        }
     }
 
     func togglePause() {
@@ -153,12 +169,14 @@ final class WorkoutManager: NSObject {
             resumedAt = nil
             session?.pause()
             WKInterfaceDevice.current().play(.stop)
+            say("Paused.")
         case .paused:
             phase = .running
             resumedAt = .now
             samples.removeAll()
             session?.resume()
             WKInterfaceDevice.current().play(.start)
+            say("Resuming.")
         default: break
         }
     }
@@ -175,7 +193,13 @@ final class WorkoutManager: NSObject {
             coaching = .none
             countdownFired = []
             lastAlert = .now // grace period before coaching kicks in
+            lastVoiceAlert = .now
             WKInterfaceDevice.current().play(.notification)
+            if let next = self.segment {
+                var line = "\(next.name), \(next.goalDescription)."
+                if let pace = next.pace { line += " Target \(VoiceCoach.spoken(pace)) per mile." }
+                say(line)
+            }
         } else {
             end()
         }
@@ -213,9 +237,11 @@ final class WorkoutManager: NSObject {
             }
         }
         WKInterfaceDevice.current().play(.success)
+        say("Workout complete. \(VoiceCoach.spokenDistance(distance)) in \(VoiceCoach.spokenDuration(accumulatedBeforePause)).")
     }
 
     func discard() {
+        voice.stop()
         reset()
         phase = .idle
     }
@@ -330,6 +356,7 @@ final class WorkoutManager: NSObject {
             lastSplit = split
             splitBannerUntil = Date.now.addingTimeInterval(8)
             WKInterfaceDevice.current().play(.notification)
+            say("Mile \(mile). \(VoiceCoach.spoken(split.seconds)).")
         }
     }
 
@@ -357,11 +384,23 @@ final class WorkoutManager: NSObject {
         let changed = newCoaching != coaching
         coaching = newCoaching
 
+        // Back in the window after being told off: one quiet confirmation.
+        if changed, newCoaching == .onPace, Date.now.timeIntervalSince(lastVoiceAlert) < 90 {
+            say("On pace.")
+        }
         // Haptic: immediately on a change, then every 20 s while still off pace.
+        // Voice: on the change, then every 60 s so it nudges without nagging.
         guard newCoaching == .speedUp || newCoaching == .slowDown else { return }
         if changed || Date.now.timeIntervalSince(lastAlert) > 20 {
             lastAlert = .now
             WKInterfaceDevice.current().play(newCoaching == .speedUp ? .directionUp : .directionDown)
+        }
+        if changed || Date.now.timeIntervalSince(lastVoiceAlert) > 60 {
+            lastVoiceAlert = .now
+            let current = VoiceCoach.spoken(pace)
+            say(newCoaching == .speedUp
+                ? "Speed up. You're at \(current), target \(VoiceCoach.spoken(target))."
+                : "Slow down. You're at \(current), target \(VoiceCoach.spoken(target)).")
         }
     }
 

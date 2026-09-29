@@ -15,6 +15,7 @@ struct WatchHomeView: View {
                             .font(.footnote).foregroundStyle(.secondary)
                         WorkoutCard(workout: next.workout)
                         Button {
+                            manager.voiceEnabled = store.voiceCues
                             manager.start(next.workout)
                         } label: {
                             Label("Start", systemImage: "play.fill").frame(maxWidth: .infinity)
@@ -37,11 +38,18 @@ struct WatchHomeView: View {
                     }
 
                     Button {
+                        manager.voiceEnabled = store.voiceCues
                         manager.start(freeRun)
                     } label: {
                         Label("Free run", systemImage: "figure.run").frame(maxWidth: .infinity)
                     }
                     .buttonStyle(.bordered)
+
+                    Toggle(isOn: Binding(get: { store.voiceCues }, set: { store.setVoiceCues($0) })) {
+                        Label("Voice cues", systemImage: "airpods")
+                    }
+                    .font(.footnote)
+                    .tint(.green)
 
                     // Lifts and mobility for today, checked off from the wrist.
                     let extras = (store.today?.workouts ?? []).filter { !$0.type.isRun && $0.type != .rest }
