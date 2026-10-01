@@ -1,6 +1,6 @@
 # Stride
 
-A running coach for iPhone + Apple Watch. Tell it the race distance, how many days a week you can run, and which days you lift; it builds a week-by-week plan with warm-ups, cool-downs, and mobility work, and the watch taps your wrist when you drift off pace.
+A running coach for iPhone + Apple Watch. Tell it the distance you're building to, which days you run, and which days you lift; it builds a week-by-week plan with warm-ups, cool-downs, and mobility work, and the watch taps your wrist when you drift off pace.
 
 ## What it does
 
@@ -40,7 +40,7 @@ Tests: `xcodebuild test -scheme Stride -destination 'platform=iOS Simulator,name
 
 `Shared/Planning/PlanGenerator.swift`:
 
-- Weekly volume starts at your current mileage, builds ~8%/week, cuts back 20% every 4th week, tapers (two steps for a marathon) before a short race week.
+- Runs are sized per run, not from a weekly total: the longest run starts at the distance you can comfortably cover today and grows a little each week (lighter every 4th week) toward the goal's peak; other runs are shorter. One run a week is just that run. Tapers (two steps for a marathon) before a short race week. A race date is optional — without one the plan is as long as a safe build-up needs.
 - Weeks 1–2 are all easy. After that: one quality session (alternating intervals / tempo), one long run, easy runs to fill. Speed work shrinks in the taper so the week's total actually drops.
 - Runs are placed around lifting days. Constraints loosen in tiers: first the day-after-long-run buffer, then the day-after-lift rule; a hard run on a lifting day itself is the last resort. An easy run can share a lift day.
 - Paces come from a recent run via Riegel's formula (`PaceCalculator.swift`): tempo ≈ one-hour race pace, intervals ≈ 3K pace, easy ≈ tempo + 80 s/mi.

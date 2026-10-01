@@ -74,8 +74,8 @@ struct SettingsView: View {
                 if let profile = store.profile, let plan = store.plan {
                     Section("Plan") {
                         LabeledContent("Goal", value: plan.goal.name)
-                        LabeledContent("Race", value: plan.raceDate.formatted(date: .abbreviated, time: .omitted))
-                        LabeledContent("Runs per week", value: "\(profile.runDaysPerWeek)")
+                        LabeledContent(profile.hasRaceDate ? "Race" : "Goal day", value: plan.raceDate.formatted(date: .abbreviated, time: .omitted))
+                        LabeledContent("Run days", value: profile.runDays.isEmpty ? "\(profile.runCount) a week" : profile.runDays.sorted().map(\.shortName).joined(separator: ", "))
                         LabeledContent("Lifting days", value: profile.strengthDays.isEmpty ? "None" : profile.strengthDays.sorted().map(\.shortName).joined(separator: ", "))
                         Button("Adjust plan…") { editing = true }
                         Button("Stop following a plan", role: .destructive) { confirmDrop = true }

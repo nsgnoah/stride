@@ -17,10 +17,12 @@ struct PlanGeneratorTests {
     static func profile(goal: GoalDistance = .tenK, days: Int = 4, lifts: Set<Weekday> = [], longDay: Weekday = .saturday, weeks: Int = 10, start: Date = date(2026, 9, 28)) -> RunnerProfile {
         var p = RunnerProfile()
         p.goal = goal
+        p.runDays = [] // let the planner place the runs, as plans from older builds do
         p.runDaysPerWeek = days
         p.strengthDays = lifts
         p.longRunDay = longDay
-        p.currentWeeklyMiles = 12
+        p.longestComfortableMiles = 3
+        p.hasRaceDate = true
         p.raceDate = calendar.date(byAdding: .day, value: 7 * weeks - 1, to: start)! // a Sunday
         return p
     }
@@ -163,20 +165,161 @@ struct PlanGeneratorTests {
         #expect(sunday.workouts.contains { $0.type == .mobility })
     }
 
-    // MARK: - Volume
+    // MARK: - Distances
 
-    @Test func volumeNeverJumpsMoreThanFifteenPercentAboveThePriorPeak() {
+    static func longRuns(_ plan: TrainingPlan) -> [Double] {
+        plan.weeks.dropLast().map { week in
+            Units.miles(week.days.flatMap(\.workouts).first { $0.type == .long }!.plannedMeters)
+        }
+    }
+
+    @Test func firstWeekStartsAtHerLongestComfortableRun() {
         for p in Self.grid {
             let plan = Self.plan(p)
-            let miles = plan.weeks.dropLast().map { Units.miles($0.plannedMeters) }
-            var peak = miles[0]
-            for i in 1..<miles.count {
-                // A week after a cutback jumps back up; what matters is never overshooting
-                // the previous peak by more than the build rate (rounding to half miles adds slack).
-                #expect(miles[i] <= peak * 1.15 + 0.5, "\(p.goal) \(p.runDaysPerWeek)d week \(i + 1): peak \(peak) → \(miles[i])")
-                peak = max(peak, miles[i])
+            let runs = plan.weeks[0].days.flatMap(\.workouts).filter { $0.type.isRun }
+            for run in runs {
+                #expect(Units.miles(run.plannedMeters) <= 3.01, "\(p.goal) \(p.runDaysPerWeek)d: \(run.title)")
+            }
+            #expect(abs(Self.longRuns(plan)[0] - 3) < 0.01)
+        }
+    }
+
+    @Test func oneRunAWeekIsARunNotAWeeksMiles() {
+        // The complaint that prompted this: one day a week used to mean one 10-mile run.
+        let plan = Self.plan(Self.profile(goal: .tenK, days: 1))
+        let longs = Self.longRuns(plan)
+        #expect(abs(longs[0] - 3) < 0.01)
+        #expect(longs.max()! >= 5 && longs.max()! <= 7)
+        #expect(abs(Units.miles(plan.weeks[0].plannedMeters) - 3) < 0.01)
+    }
+
+    @Test func runLengthDoesNotDependOnHowManyDaysSheRuns() {
+        for goal in GoalDistance.allCases {
+            let one = Self.longRuns(Self.plan(Self.profile(goal: goal, days: 1, weeks: goal.defaultWeeks)))
+            for days in 2...6 {
+                let other = Self.longRuns(Self.plan(Self.profile(goal: goal, days: days, weeks: goal.defaultWeeks)))
+                #expect(zip(one, other).allSatisfy { abs($0 - $1) < 0.01 } && one.count == other.count, "\(goal) \(days)d")
             }
         }
+    }
+
+    @Test func longRunGrowsGradually() {
+        for p in Self.grid {
+            let longs = Self.longRuns(Self.plan(p))
+            var peak = longs[0]
+            for (i, miles) in longs.enumerated().dropFirst() {
+                // A week after a lighter one steps back up; what matters is never
+                // overshooting the previous longest by more than the safe step.
+                #expect(miles <= peak + PlanGenerator.maxStep(from: peak) + 0.01, "\(p.goal) week \(i + 1): \(peak) → \(miles)")
+                peak = max(peak, miles)
+            }
+            #expect(peak > longs[0], "\(p.goal): the plan should build")
+        }
+    }
+
+    @Test func otherRunsAreShorterThanTheLongRun() {
+        for p in Self.grid where p.runDaysPerWeek >= 2 {
+            let plan = Self.plan(p)
+            for week in plan.weeks.dropLast() {
+                let runs = week.days.flatMap(\.workouts)
+                let long = runs.first { $0.type == .long }!.plannedMeters
+                for easy in runs where easy.type == .easy {
+                    #expect(easy.plannedMeters <= long + 1, "\(p.goal) \(p.runDaysPerWeek)d week \(week.number)")
+                }
+            }
+        }
+    }
+
+    @Test func anExperiencedRunnerKeepsHerDistance() {
+        var p = Self.profile(goal: .fiveK, days: 3, weeks: 8)
+        p.longestComfortableMiles = 5
+        let longs = Self.longRuns(Self.plan(p))
+        #expect(abs(longs[0] - 5) < 0.01)
+        #expect(longs.max()! <= GoalDistance.fiveK.longRunCapMiles + 0.01)
+    }
+
+    // MARK: - Her own days
+
+    static func chosen(_ days: Set<Weekday>, lifts: Set<Weekday> = [], longDay: Weekday = .saturday, goal: GoalDistance = .tenK) -> RunnerProfile {
+        var p = profile(goal: goal, lifts: lifts, longDay: longDay)
+        p.runDays = days
+        return p
+    }
+
+    @Test func runsLandOnlyOnTheDaysShePicked() {
+        let sets: [Set<Weekday>] = [[.monday, .wednesday, .friday], [.tuesday, .saturday], [.sunday], [.monday, .tuesday, .thursday, .saturday, .sunday]]
+        for days in sets {
+            for lifts in [Set<Weekday>(), [.tuesday, .thursday], [.monday, .wednesday, .friday]] {
+                let p = Self.chosen(days, lifts: lifts, longDay: days.sorted().last!)
+                let plan = Self.plan(p)
+                for week in plan.weeks.dropLast() {
+                    let runDays = Set(week.days.filter { $0.workouts.contains { $0.type.isRun } }.map(\.weekday))
+                    #expect(runDays == days, "week \(week.number): \(runDays)")
+                    let longDay = week.days.first { $0.workouts.contains { $0.type == .long } }!.weekday
+                    #expect(longDay == p.longRunDay)
+                }
+            }
+        }
+    }
+
+    @Test func fasterRunAvoidsLiftsWhenHerDaysAllow() {
+        // Mon/Wed/Sat runs, lifts Tue: Wed is the day after a lift, so the fast day is Monday.
+        let plan = Self.plan(Self.chosen([.monday, .wednesday, .saturday], lifts: [.tuesday]))
+        for week in plan.weeks.dropLast() {
+            for day in week.days where day.workouts.contains(where: { $0.type == .tempo || $0.type == .intervals }) {
+                #expect(day.weekday == .monday, "week \(week.number)")
+            }
+        }
+    }
+
+    @Test func speedWorkCanBeTurnedOff() {
+        var p = Self.chosen([.monday, .wednesday, .friday, .saturday])
+        p.includeSpeedWork = false
+        let types = Set(Self.plan(p).allDays.flatMap(\.workouts).map(\.type))
+        #expect(!types.contains(.tempo) && !types.contains(.intervals))
+        p.includeSpeedWork = true
+        let withSpeed = Set(Self.plan(p).allDays.flatMap(\.workouts).map(\.type))
+        #expect(withSpeed.contains(.tempo) && withSpeed.contains(.intervals))
+    }
+
+    // MARK: - No race date
+
+    @Test func withoutADateThePlanIsAsLongAsTheBuildNeeds() {
+        for goal in GoalDistance.allCases {
+            var p = Self.chosen([.tuesday, .saturday], goal: goal)
+            p.hasRaceDate = false
+            p.raceDate = .distantPast // ignored
+            let plan = Self.plan(p)
+            #expect(plan.weeks.count == PlanGenerator.suggestedWeeks(for: p), "\(goal)")
+            // It ends with the full distance on her long-run day…
+            let goalDay = plan.weeks.last!.days.first { $0.workouts.contains { $0.type == .race } }
+            #expect(goalDay?.weekday == .saturday, "\(goal)")
+            // …having built all the way to the peak, one safe step at a time.
+            let longs = Self.longRuns(plan)
+            #expect(abs(longs.max()! - PlanGenerator.peakLongMiles(for: p)) < 0.01, "\(goal): \(longs)")
+        }
+    }
+
+    @Test func aBeginnerGetsALongerRunwayThanSomeoneAlreadyRunning() {
+        var beginner = Self.chosen([.saturday])
+        beginner.hasRaceDate = false
+        beginner.longestComfortableMiles = 1
+        var regular = beginner
+        regular.longestComfortableMiles = 5
+        #expect(PlanGenerator.suggestedWeeks(for: beginner) > PlanGenerator.suggestedWeeks(for: regular))
+    }
+
+    // MARK: - Saved data
+
+    @Test func profilesSavedByOlderBuildsStillLoad() throws {
+        let old = #"{"goal":"tenK","raceDate":800000000,"runDaysPerWeek":2,"strengthDays":[2,5],"longRunDay":7,"currentWeeklyMiles":10,"recentRunMeters":4828.032,"recentRunSeconds":1800}"#
+        let goalRaw = String(data: try JSONEncoder().encode(GoalDistance.tenK), encoding: .utf8)!
+        let json = old.replacingOccurrences(of: "\"tenK\"", with: goalRaw)
+        let p = try JSONDecoder().decode(RunnerProfile.self, from: Data(json.utf8))
+        #expect(p.runDays.isEmpty && p.runCount == 2)
+        #expect(p.hasRaceDate && p.includeSpeedWork)
+        #expect(p.longestComfortableMiles == 3)
+        #expect(PlanGenerator.automaticRunDays(for: p).count == 2)
     }
 
     @Test func longRunNeverExceedsTheGoalCap() {

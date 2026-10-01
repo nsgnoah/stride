@@ -55,7 +55,14 @@ struct TodayView: View {
                 if let today = store.today {
                     Section("Today") {
                         ForEach(today.workouts) { workout in
-                            NavigationLink(value: workout) { WorkoutRow(workout: workout) }
+                            if workout.type.isRun, workout.type != .race, !store.isCompleted(workout), store.plan?.isSkipped(workout) != true {
+                                VStack(alignment: .leading, spacing: 8) {
+                                    NavigationLink(value: workout) { WorkoutRow(workout: workout) }
+                                    RescheduleButtons(workout: workout, day: today)
+                                }
+                            } else {
+                                NavigationLink(value: workout) { WorkoutRow(workout: workout) }
+                            }
                         }
                     }
                 } else if let plan = store.plan, plan.raceDate < .now {
@@ -91,7 +98,14 @@ struct TodayView: View {
 
                 if let next = store.nextRun, !Calendar.current.isDateInToday(next.day.date) {
                     Section("Next run · \(next.day.date.formatted(.dateTime.weekday(.wide)))") {
-                        NavigationLink(value: next.workout) { WorkoutRow(workout: next.workout) }
+                        if next.workout.type == .race {
+                            NavigationLink(value: next.workout) { WorkoutRow(workout: next.workout) }
+                        } else {
+                            VStack(alignment: .leading, spacing: 8) {
+                                NavigationLink(value: next.workout) { WorkoutRow(workout: next.workout) }
+                                RescheduleButtons(workout: next.workout, day: next.day)
+                            }
+                        }
                     }
                 }
 
@@ -118,6 +132,87 @@ struct TodayView: View {
     /// This week, or the first week if the plan hasn't started yet.
     private var displayWeek: PlannedWeek? {
         store.thisWeek ?? store.plan?.weeks.first { $0.startDate > .now }
+    }
+}
+
+/// One-tap rescheduling under a run: bump it a day, or pick any other day.
+struct RescheduleButtons: View {
+    @Environment(AppStore.self) private var store
+    let workout: Workout
+    let day: PlannedDay
+    @State private var choosingDay = false
+
+    /// The day after this run's, if the plan has one and it doesn't already hold a run.
+    private var nextDay: PlannedDay? {
+        guard let date = Calendar.current.date(byAdding: .day, value: 1, to: day.date),
+              let target = store.plan?.day(on: date),
+              !target.workouts.contains(where: { $0.type.isRun }) else { return nil }
+        return target
+    }
+
+    var body: some View {
+        HStack {
+            if let nextDay {
+                Button(Calendar.current.isDateInToday(day.date) ? "Push to tomorrow" : "Push to \(nextDay.date.formatted(.dateTime.weekday(.wide)))") {
+                    withAnimation { store.move(workout, to: nextDay.date) }
+                }
+                .buttonStyle(.bordered).controlSize(.small)
+            }
+            Button("Another day…") { choosingDay = true }
+                .buttonStyle(.bordered).controlSize(.small)
+        }
+        .sheet(isPresented: $choosingDay) { MoveWorkoutSheet(workout: workout) }
+    }
+}
+
+/// Pick a new day for a workout. Shows what's already on the day she's looking at.
+struct MoveWorkoutSheet: View {
+    @Environment(AppStore.self) private var store
+    @Environment(\.dismiss) private var dismiss
+    let workout: Workout
+    var onMove: () -> Void = {}
+    @State private var moveDate = Date.now
+
+    var body: some View {
+        NavigationStack {
+            Form {
+                if let range = planDateRange {
+                    DatePicker("New day", selection: $moveDate, in: range, displayedComponents: .date)
+                        .datePickerStyle(.graphical)
+                }
+                if let target = store.plan?.day(on: moveDate) {
+                    Section("Already that day") {
+                        ForEach(target.workouts) { w in
+                            Label(w.title, systemImage: w.type.symbol).foregroundStyle(w.type.tint)
+                        }
+                    }
+                }
+            }
+            .navigationTitle("Move \(workout.type.name.lowercased())")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) { Button("Cancel") { dismiss() } }
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Move") {
+                        store.move(workout, to: moveDate)
+                        dismiss()
+                        onMove()
+                    }
+                    .bold()
+                }
+            }
+            .onAppear {
+                let current = store.plan?.date(of: workout.id) ?? .now
+                moveDate = planDateRange.map { min(max(current, $0.lowerBound), $0.upperBound) } ?? current
+            }
+        }
+        .presentationDetents([.large])
+    }
+
+    private var planDateRange: ClosedRange<Date>? {
+        guard let first = store.plan?.allDays.first?.date, let last = store.plan?.allDays.last?.date else { return nil }
+        let today = Calendar.current.startOfDay(for: .now)
+        return max(first, today)...last
     }
 }
 
@@ -165,7 +260,6 @@ struct WorkoutDetailView: View {
     @Environment(\.dismiss) private var dismiss
     let workout: Workout
     @State private var moving = false
-    @State private var moveDate = Date.now
     @State private var loggingManually = false
 
     private var isSkipped: Bool { store.plan?.isSkipped(workout) == true }
@@ -257,11 +351,7 @@ struct WorkoutDetailView: View {
             if workout.type != .rest, workout.type != .strength, !isDone {
                 ToolbarItem(placement: .primaryAction) {
                     Menu {
-                        Button("Move to another day…", systemImage: "calendar") {
-                            let current = store.plan?.date(of: workout.id) ?? .now
-                            moveDate = planDateRange.map { min(max(current, $0.lowerBound), $0.upperBound) } ?? current
-                            moving = true
-                        }
+                        Button("Move to another day…", systemImage: "calendar") { moving = true }
                         if isSkipped {
                             Button("Put it back", systemImage: "arrow.uturn.backward") { store.unskip(workout) }
                         } else {
@@ -277,42 +367,8 @@ struct WorkoutDetailView: View {
             LogActivityView(prefill: workout, date: store.plan?.date(of: workout.id))
         }
         .sheet(isPresented: $moving) {
-            NavigationStack {
-                Form {
-                    if let range = planDateRange {
-                        DatePicker("New day", selection: $moveDate, in: range, displayedComponents: .date)
-                            .datePickerStyle(.graphical)
-                    }
-                    if let target = store.plan?.day(on: moveDate) {
-                        Section("Already that day") {
-                            ForEach(target.workouts) { w in
-                                Label(w.title, systemImage: w.type.symbol).foregroundStyle(w.type.tint)
-                            }
-                        }
-                    }
-                }
-                .navigationTitle("Move \(workout.type.name.lowercased())")
-                .navigationBarTitleDisplayMode(.inline)
-                .toolbar {
-                    ToolbarItem(placement: .cancellationAction) { Button("Cancel") { moving = false } }
-                    ToolbarItem(placement: .confirmationAction) {
-                        Button("Move") {
-                            store.move(workout, to: moveDate)
-                            moving = false
-                            dismiss()
-                        }
-                        .bold()
-                    }
-                }
-            }
-            .presentationDetents([.large])
+            MoveWorkoutSheet(workout: workout) { dismiss() }
         }
-    }
-
-    private var planDateRange: ClosedRange<Date>? {
-        guard let first = store.plan?.allDays.first?.date, let last = store.plan?.allDays.last?.date else { return nil }
-        let today = Calendar.current.startOfDay(for: .now)
-        return max(first, today)...last
     }
 
     private func stat(_ label: String, _ value: String) -> some View {

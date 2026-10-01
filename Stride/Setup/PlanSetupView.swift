@@ -22,8 +22,14 @@ struct PlanSetupView: View {
             if let recentEffort {
                 p.recentRunMeters = recentEffort.meters
                 p.recentRunSeconds = recentEffort.durationSeconds
+                // She just covered this distance; don't start the next plan below it.
+                let covered = (Units.miles(recentEffort.meters) * 2).rounded(.down) / 2
+                p.longestComfortableMiles = max(p.longestComfortableMiles, min(covered, p.goal.longRunCapMiles))
             }
         }
+        // Plans made before run days could be chosen: start from the days she's been given.
+        if p.runDays.isEmpty { p.runDays = PlanGenerator.automaticRunDays(for: p) }
+        if !p.runDays.contains(p.longRunDay) { p.longRunDay = Self.defaultLongDay(in: p.runDays) ?? p.longRunDay }
         _profile = State(initialValue: p)
         _recentMiles = State(initialValue: Units.miles(p.recentRunMeters))
         _recentMinutes = State(initialValue: Int(p.recentRunSeconds) / 60)
@@ -33,8 +39,30 @@ struct PlanSetupView: View {
 
     private var preview: PaceProfile { PaceCalculator.profile(for: builtProfile) }
 
+    /// The weekend day if she runs on one, otherwise her last run day of the week.
+    private static func defaultLongDay(in days: Set<Weekday>) -> Weekday? {
+        [.saturday, .sunday].first(where: days.contains) ?? days.sorted().last
+    }
+
+    private var runSummary: String {
+        let count = profile.runDays.count
+        let range = PlanGenerator.longRunRange(for: builtProfile)
+        let first = Self.miles(range.first), peak = Self.miles(range.peak)
+        if count == 0 { return "Pick at least one day." }
+        let growth = range.peak > range.first ? "starts at \(first) mi and builds to \(peak) mi" : "holds at \(first) mi"
+        if count == 1 {
+            return "One run a week. It \(growth) — no weekly mileage to hit."
+        }
+        return "\(count) runs a week. The longest \(growth); the others are shorter."
+    }
+
+    private static func miles(_ x: Double) -> String {
+        x == x.rounded() ? String(Int(x)) : String(format: "%.1f", x)
+    }
+
     private var builtProfile: RunnerProfile {
         var p = profile
+        p.runDaysPerWeek = max(1, p.runDays.count)
         p.recentRunMeters = Units.meters(miles: recentMiles)
         p.recentRunSeconds = TimeInterval(recentMinutes * 60 + recentSeconds)
         return p
@@ -62,13 +90,21 @@ struct PlanSetupView: View {
                     Picker("Goal distance", selection: $profile.goal) {
                         ForEach(GoalDistance.allCases) { Text($0.name).tag($0) }
                     }
-                    DatePicker("Race day", selection: $profile.raceDate, in: minRaceDate..., displayedComponents: .date)
-                    Text("\(profile.weeksUntilRace) weeks of training")
-                        .font(.footnote).foregroundStyle(.secondary)
+                    Toggle("I have a race date", isOn: $profile.hasRaceDate)
+                    if profile.hasRaceDate {
+                        DatePicker("Race day", selection: $profile.raceDate, in: minRaceDate..., displayedComponents: .date)
+                        Text("\(profile.weeksUntilRace) weeks of training")
+                            .font(.footnote).foregroundStyle(.secondary)
+                    } else {
+                        Text("About \(builtProfile.weeksUntilRace) weeks to build up to a \(profile.goal.name), a little further each week.")
+                            .font(.footnote).foregroundStyle(.secondary)
+                    }
                 } header: {
                     Text("The goal")
                 } footer: {
-                    Text("No race? Pick the date you'd like to be able to run the distance. \(profile.goal.defaultWeeks) weeks is typical for a \(profile.goal.name).")
+                    Text(profile.hasRaceDate
+                         ? "\(profile.goal.defaultWeeks) weeks is typical for a \(profile.goal.name)."
+                         : "No date needed — the plan takes as long as a safe build-up takes from where you are now.")
                 }
                 .onChange(of: profile.goal) { _, goal in
                     if !isEditing {
@@ -76,33 +112,44 @@ struct PlanSetupView: View {
                     }
                 }
 
-                Section("Your week") {
-                    Stepper("Run \(profile.runDaysPerWeek) day\(profile.runDaysPerWeek == 1 ? "" : "s") a week", value: $profile.runDaysPerWeek, in: 1...6)
-                    if profile.runDaysPerWeek < 3 {
-                        Text(profile.runDaysPerWeek == 1
-                             ? "One run a week: a steady long run that grows gradually. Fine for staying in it; add a day when you want to build faster."
-                             : "Two runs a week: a long run plus an easy run, with some faster running mixed in after the first two weeks.")
+                Section {
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("Run days")
+                        WeekdayPicker(selection: $profile.runDays, tint: .green)
+                        Text(runSummary)
                             .font(.footnote).foregroundStyle(.secondary)
+                    }
+                    if profile.runDays.count > 1 {
+                        Picker("Longest run on", selection: $profile.longRunDay) {
+                            ForEach(profile.runDays.sorted()) { Text($0.shortName).tag($0) }
+                        }
                     }
                     VStack(alignment: .leading, spacing: 8) {
                         Text("Lifting days")
                         WeekdayPicker(selection: $profile.strengthDays)
-                        Text("Runs get scheduled around these. No hard runs the day after legs.")
+                        Text("Shown alongside your runs. Faster runs steer clear of them when your run days allow.")
                             .font(.footnote).foregroundStyle(.secondary)
                     }
-                    Picker("Long run day", selection: $profile.longRunDay) {
-                        ForEach(Weekday.ordered) { Text($0.shortName).tag($0) }
+                    if profile.runDays.count > 1 {
+                        Toggle("Include faster workouts", isOn: $profile.includeSpeedWork)
+                    }
+                } header: {
+                    Text("Your week")
+                } footer: {
+                    Text("These are your regular days. When life gets in the way, any run can be pushed to tomorrow or another day with one tap.")
+                }
+                .onChange(of: profile.runDays) { _, days in
+                    if !days.contains(profile.longRunDay), let day = Self.defaultLongDay(in: days) {
+                        profile.longRunDay = day
                     }
                 }
 
                 Section {
-                    HStack {
-                        Text("Weekly miles right now")
-                        Spacer()
-                        TextField("10", value: $profile.currentWeeklyMiles, format: .number)
-                            .keyboardType(.decimalPad)
-                            .multilineTextAlignment(.trailing)
-                            .frame(width: 60)
+                    Stepper(value: $profile.longestComfortableMiles, in: 1...20, step: 0.5) {
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text("Longest comfortable run")
+                            Text("\(Self.miles(profile.longestComfortableMiles)) mi").font(.subheadline).foregroundStyle(.secondary)
+                        }
                     }
                     HStack {
                         Text("A recent run")
@@ -124,7 +171,7 @@ struct PlanSetupView: View {
                 } header: {
                     Text("Current fitness")
                 } footer: {
-                    Text("Any recent effort works — a hard 5K, a solid 3-miler, a race. The watch uses these paces to tell you when to speed up or slow down.")
+                    Text("Longest comfortable run is how far you could go today without it being a struggle — your first week starts there. For the recent run, any effort works: a hard 5K, a solid 3-miler, a race. The watch uses it to tell you when to speed up or slow down.")
                 }
 
                 Section {
@@ -149,6 +196,7 @@ struct PlanSetupView: View {
                         dismiss()
                     }
                     .bold()
+                    .disabled(profile.runDays.isEmpty)
                 }
             }
         }
@@ -161,6 +209,7 @@ struct PlanSetupView: View {
 
 struct WeekdayPicker: View {
     @Binding var selection: Set<Weekday>
+    var tint: Color = .indigo
 
     var body: some View {
         HStack(spacing: 6) {
@@ -172,7 +221,7 @@ struct WeekdayPicker: View {
                     Text(day.letter)
                         .font(.subheadline.weight(.semibold))
                         .frame(maxWidth: .infinity, minHeight: 36)
-                        .background(on ? Color.indigo : Color(.tertiarySystemFill), in: Circle())
+                        .background(on ? tint : Color(.tertiarySystemFill), in: Circle())
                         .foregroundStyle(on ? .white : .primary)
                 }
                 .buttonStyle(.plain)
