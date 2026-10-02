@@ -74,7 +74,7 @@ struct TodayWidget: Widget {
     var body: some WidgetConfiguration {
         StaticConfiguration(kind: "co.nsgsolutions.Stride.today", provider: TodayProvider()) { entry in
             TodayWidgetView(entry: entry)
-                .containerBackground(.fill.tertiary, for: .widget)
+                .containerBackground(for: .widget) { TodayWidgetBackground(entry: entry) }
         }
         .configurationDisplayName("Today's run")
         .description("What's on the plan today, and how the week looks.")
@@ -160,34 +160,62 @@ struct TodayWidgetView: View {
     }
 
     #if os(iOS)
+    /// Distance runs lead with the number; a tempo or interval session leads with its name.
+    private var leadsWithDistance: Bool {
+        guard let main else { return false }
+        return [.easy, .long, .shakeout, .race].contains(main.type) && main.plannedMeters > 0
+    }
+
     private var small: some View {
-        VStack(alignment: .leading, spacing: 6) {
+        VStack(alignment: .leading, spacing: 4) {
             HStack {
-                Text(entry.date.formatted(.dateTime.weekday(.wide)).uppercased())
-                    .font(.caption2.weight(.semibold)).foregroundStyle(.secondary)
-                Spacer()
-                if let week = entry.week {
-                    Text("W\(week.number)/\(entry.weekCount)").font(.caption2).foregroundStyle(.secondary)
+                if let main, main.type != .rest {
+                    Label(main.type.name.uppercased(), systemImage: main.type.symbol)
+                        .labelStyle(.titleAndIcon)
+                        .font(.system(size: 10, weight: .bold)).tracking(0.6)
+                        .foregroundStyle(main.type.tint)
+                        .lineLimit(1)
+                } else {
+                    Text(entry.date.formatted(.dateTime.weekday(.wide)).uppercased())
+                        .font(.system(size: 10, weight: .bold)).tracking(0.6)
+                        .foregroundStyle(.stride)
+                }
+                Spacer(minLength: 0)
+                // The medium widget names the week on its other half.
+                if family != .systemMedium, let week = entry.week {
+                    Text("W\(week.number)").font(.caption2.weight(.medium)).foregroundStyle(.white.opacity(0.5))
                 }
             }
             Spacer(minLength: 0)
-            if let main {
-                Image(systemName: main.type.symbol)
-                    .font(.title)
-                    .foregroundStyle(main.type.tint)
-                Text(main.title).font(.headline).lineLimit(2).minimumScaleFactor(0.8)
+            if let main, main.type != .rest {
+                if leadsWithDistance {
+                    HStack(alignment: .firstTextBaseline, spacing: 4) {
+                        Text(Units.miles(main.plannedMeters).formatted(.number.precision(.fractionLength(0...1))))
+                            .font(.system(size: 50, weight: .bold, design: .rounded))
+                        Text("mi").font(.headline).foregroundStyle(.white.opacity(0.6))
+                    }
+                    .strikethrough(entry.skipped.contains(main.id))
+                } else {
+                    Text(main.title)
+                        .font(.system(size: 24, weight: .bold, design: .rounded))
+                        .lineLimit(2).minimumScaleFactor(0.7)
+                }
                 if isDone {
-                    Label("Done", systemImage: "checkmark").font(.caption).foregroundStyle(Color.jade)
+                    Label("Done", systemImage: "checkmark.circle.fill").font(.caption.weight(.semibold)).foregroundStyle(Color.jade)
                 } else if let pace = main.mainPace {
-                    Text(pace.formatted).font(.caption).foregroundStyle(.secondary)
+                    Text(pace.formatted).font(.caption.weight(.medium)).monospacedDigit().foregroundStyle(.white.opacity(0.6))
+                        .lineLimit(1).minimumScaleFactor(0.8)
                 } else if let second = entry.workouts.dropFirst().first, entry.workouts.count > 1 {
-                    Text("+ \(second.title)").font(.caption).foregroundStyle(.secondary)
+                    Text("+ \(second.title)").font(.caption).foregroundStyle(.white.opacity(0.6))
                 }
             } else {
-                Image(systemName: "figure.run").font(.title).foregroundStyle(.secondary)
-                Text(entry.hasPlan ? "Rest day" : "Build a plan in Stride").font(.headline)
+                Image(systemName: entry.hasPlan ? "bed.double.fill" : "figure.run").font(.title2).foregroundStyle(.white.opacity(0.5))
+                Text(entry.hasPlan ? "Rest day" : "Build a plan in Stride")
+                    .font(.system(size: 20, weight: .bold, design: .rounded))
+                    .lineLimit(2).minimumScaleFactor(0.8)
             }
         }
+        .foregroundStyle(.white)
     }
 
     private var medium: some View {
@@ -195,7 +223,9 @@ struct TodayWidgetView: View {
             small.frame(maxWidth: .infinity, alignment: .leading)
             if let week = entry.week {
                 VStack(alignment: .leading, spacing: 6) {
-                    Text(week.focus).font(.caption2).foregroundStyle(.secondary).lineLimit(2)
+                    Text("WEEK \(week.number) OF \(entry.weekCount)")
+                        .font(.system(size: 10, weight: .bold)).tracking(0.6).foregroundStyle(.stride)
+                    Text(week.focus).font(.caption2).foregroundStyle(.white.opacity(0.6)).lineLimit(2)
                     Spacer(minLength: 0)
                     HStack(spacing: 4) {
                         ForEach(week.days) { day in
@@ -204,26 +234,51 @@ struct TodayWidgetView: View {
                             let isToday = Calendar.current.isDate(day.date, inSameDayAs: entry.date)
                             VStack(spacing: 3) {
                                 Text(day.weekday.letter).font(.system(size: 9, weight: isToday ? .bold : .regular))
-                                    .foregroundStyle(isToday ? .primary : .secondary)
+                                    .foregroundStyle(.white.opacity(isToday ? 1 : 0.5))
                                 ZStack {
-                                    Circle().fill(dayMain.type == .rest ? Color.secondary.opacity(0.15) : dayMain.type.tint.opacity(done ? 1 : 0.25))
+                                    Circle().fill(dayMain.type == .rest ? Color.white.opacity(0.1) : dayMain.type.tint.opacity(done ? 1 : 0.3))
                                     Image(systemName: done ? "checkmark" : dayMain.type.symbol)
                                         .font(.system(size: 9, weight: .bold))
-                                        .foregroundStyle(done ? .white : dayMain.type.tint)
+                                        .foregroundStyle(done ? .white : (dayMain.type == .rest ? Color.white.opacity(0.4) : dayMain.type.tint))
                                 }
                                 .frame(width: 22, height: 22)
-                                .overlay { if isToday { Circle().strokeBorder(.primary, lineWidth: 1).padding(-2) } }
+                                .overlay { if isToday { Circle().strokeBorder(.stride, lineWidth: 1.5).padding(-2) } }
                             }
                         }
                     }
                     Text("\(Formatting.miles(week.plannedMeters, decimals: 0)) planned")
-                        .font(.caption2).foregroundStyle(.secondary)
+                        .font(.caption2).foregroundStyle(.white.opacity(0.6))
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
             }
         }
     }
     #endif
+}
+
+/// The app's ink card behind the Home Screen widgets, glowing in the colour of today's
+/// workout. Lock Screen and watch-face widgets keep the system's own backing.
+struct TodayWidgetBackground: View {
+    @Environment(\.widgetFamily) private var family
+    let entry: TodayEntry
+
+    private var glow: Color {
+        let main = entry.workouts.first { $0.type.isRun && !entry.skipped.contains($0.id) } ?? entry.workouts.first
+        guard let main, main.type != .rest else { return .ember }
+        return main.type.tint
+    }
+
+    var body: some View {
+        switch family {
+        case .systemSmall, .systemMedium, .systemLarge, .systemExtraLarge:
+            ZStack {
+                LinearGradient(colors: [.ink, .inkDeep], startPoint: .top, endPoint: .bottom)
+                RadialGradient(colors: [glow.opacity(0.5), .clear], center: .topTrailing, startRadius: 0, endRadius: 150)
+            }
+        default:
+            Color.clear
+        }
+    }
 }
 
 #if os(iOS)
