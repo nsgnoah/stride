@@ -2,17 +2,22 @@ import SwiftUI
 
 @main
 struct StrideApp: App {
-    @State private var store = AppStore()
+    @State private var store: AppStore
     @Environment(\.scenePhase) private var scenePhase
+
+    init() {
+        // Wired up here rather than when the first screen appears, so a background launch
+        // (the watch asking for the plan, or handing over a run) is answered too.
+        let store = AppStore()
+        _store = State(initialValue: store)
+        Connectivity.shared.store = store
+        Connectivity.shared.activate()
+    }
 
     var body: some Scene {
         WindowGroup {
             ContentView()
                 .environment(store)
-                .task {
-                    Connectivity.shared.store = store
-                    Connectivity.shared.activate()
-                }
                 .onChange(of: scenePhase) { _, phase in
                     // Pick up runs she logged elsewhere whenever the app comes forward.
                     // Only after she has granted access once (from Progress), never a cold prompt.

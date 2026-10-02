@@ -153,6 +153,14 @@ struct SettingsView: View {
                 Section {
                     Button("Sync plan to watch") { Connectivity.shared.send(plan: store.plan) }
                     Button("Start over", role: .destructive) { showReset = true }
+                } footer: {
+                    if store.plan != nil {
+                        if let at = store.watchConfirmedPlanAt {
+                            Text("Your watch has this plan (confirmed \(at.formatted(date: .omitted, time: .shortened))).")
+                        } else {
+                            Text("Plan changes reach the watch on their own. Open Stride on the watch to confirm it has the latest.")
+                        }
+                    }
                 }
                 Section("About") {
                     Text("Your plan and runs are stored only on your iPhone and Apple Watch. Runs you save are written to Apple Health on your device. Stride has no account, no server, and no analytics.")

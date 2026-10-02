@@ -13,6 +13,8 @@ final class AppStore {
     /// Hour of the morning reminder on run days; nil when reminders are off.
     /// Set via `setReminderHour` so loading a snapshot never triggers a save.
     private(set) var reminderHour: Int?
+    /// Phone only, not saved: when the watch last confirmed it holds the current plan.
+    var watchConfirmedPlanAt: Date?
     /// She chose to skip the plan and just track runs. Cleared when a plan is built.
     private(set) var freeMode: Bool = false
 

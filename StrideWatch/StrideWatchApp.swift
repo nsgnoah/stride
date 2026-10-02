@@ -2,8 +2,16 @@ import SwiftUI
 
 @main
 struct StrideWatchApp: App {
-    @State private var store = AppStore(filename: "stride-watch.json")
+    @State private var store: AppStore
     @State private var manager = WorkoutManager()
+    @Environment(\.scenePhase) private var scenePhase
+
+    init() {
+        let store = AppStore(filename: "stride-watch.json")
+        _store = State(initialValue: store)
+        Connectivity.shared.store = store
+        Connectivity.shared.activate()
+    }
 
     var body: some Scene {
         WindowGroup {
@@ -11,9 +19,11 @@ struct StrideWatchApp: App {
                 .environment(store)
                 .environment(manager)
                 .task {
-                    Connectivity.shared.store = store
-                    Connectivity.shared.activate()
                     await manager.requestAuthorization()
+                }
+                .onChange(of: scenePhase) { _, phase in
+                    // Every time she raises the app, make sure it has the phone's latest plan.
+                    if phase == .active { Connectivity.shared.refreshFromPhone() }
                 }
         }
     }
