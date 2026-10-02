@@ -23,16 +23,10 @@ struct CoachingView: View {
             // Segment header
             HStack {
                 if let split = manager.lastSplit, Date.now < manager.splitBannerUntil {
-                    Text("Mile \(split.mile) · \(Formatting.duration(split.seconds))")
-                        .font(.footnote.weight(.semibold))
-                        .foregroundStyle(Color.gold)
-                        .lineLimit(1)
+                    Eyebrow(text: "Mile \(split.mile) · \(Formatting.duration(split.seconds))", color: .gold)
                         .transition(.opacity)
                 } else {
-                    Text(manager.segment?.name ?? "Run")
-                        .font(.footnote.weight(.semibold))
-                        .foregroundStyle(manager.segment?.kind.tint ?? .primary)
-                        .lineLimit(1)
+                    Eyebrow(text: manager.segment?.name ?? "Run", color: manager.segment?.kind.tint ?? .ember)
                 }
                 Spacer()
                 Text(manager.segmentRemainingText)
@@ -42,24 +36,31 @@ struct CoachingView: View {
             }
 
             if let progress = manager.segmentProgress {
-                ProgressView(value: progress)
-                    .tint(manager.segment?.kind.tint ?? .accentColor)
+                GeometryReader { geo in
+                    ZStack(alignment: .leading) {
+                        Capsule().fill(.white.opacity(0.14))
+                        Capsule().fill(.stride).frame(width: max(5, geo.size.width * min(1, max(0, progress))))
+                    }
+                }
+                .frame(height: 5)
             }
 
             Spacer(minLength: 0)
 
             // The big number: current pace, colored by whether she's on target.
             Text(manager.currentPace?.formatted ?? "--:--")
-                .font(.system(size: 44, weight: .bold, design: .rounded).monospacedDigit())
+                .font(.system(size: 46, weight: .bold, design: .rounded).monospacedDigit())
                 .foregroundStyle(paceColor)
                 .contentTransition(.numericText())
                 .minimumScaleFactor(0.6)
 
             if let target = manager.segment?.pace {
-                VStack(spacing: 1) {
-                    Text(coachingText)
-                        .font(.caption.weight(.semibold))
-                        .foregroundStyle(paceColor)
+                VStack(spacing: 3) {
+                    Label(coachingText, systemImage: coachingSymbol)
+                        .font(.caption2.weight(.bold))
+                        .padding(.horizontal, 8).padding(.vertical, 2)
+                        .background(glowColor.opacity(0.22), in: Capsule())
+                        .foregroundStyle(manager.coaching == .none ? Color.secondary : paceColor)
                     Text(target.formatted)
                         .font(.caption2)
                         .foregroundStyle(.secondary)
@@ -72,14 +73,17 @@ struct CoachingView: View {
             Spacer(minLength: 0)
 
             HStack {
-                metric(Formatting.duration(manager.elapsed), "time")
+                WatchStat("Time", Formatting.duration(manager.elapsed))
                 Spacer()
-                metric(Formatting.miles(manager.distance, decimals: 2), "dist")
+                WatchStat("Dist", Formatting.miles(manager.distance, decimals: 2))
                 Spacer()
-                metric(manager.heartRate.map { "\(Int($0))" } ?? "--", "bpm")
+                WatchStat("Bpm", manager.heartRate.map { "\(Int($0))" } ?? "--")
             }
         }
         .padding(.horizontal, 6)
+        // The glow says the same thing as the number: on pace, too fast, too slow.
+        .glow(glowColor)
+        .animation(.easeInOut(duration: 0.6), value: manager.coaching)
         .overlay(alignment: .top) {
             if manager.phase == .paused {
                 Text(manager.autoPaused ? "AUTO-PAUSED" : "PAUSED").font(.caption2.bold()).padding(.horizontal, 8).padding(.vertical, 2)
@@ -98,19 +102,25 @@ struct CoachingView: View {
         }
     }
 
+    private var glowColor: Color {
+        manager.coaching == .none ? (manager.segment?.kind.tint ?? .ember) : paceColor
+    }
+
     private var coachingText: String {
         switch manager.coaching {
-        case .speedUp: "▲ Speed up"
-        case .slowDown: "▼ Slow down"
-        case .onPace: "✓ On pace"
+        case .speedUp: "Speed up"
+        case .slowDown: "Slow down"
+        case .onPace: "On pace"
         case .none: "Target"
         }
     }
 
-    private func metric(_ value: String, _ label: String) -> some View {
-        VStack(spacing: 0) {
-            Text(value).font(.footnote.monospacedDigit().weight(.medium))
-            Text(label).font(.system(size: 9)).foregroundStyle(.secondary)
+    private var coachingSymbol: String {
+        switch manager.coaching {
+        case .speedUp: "arrow.up"
+        case .slowDown: "arrow.down"
+        case .onPace: "checkmark"
+        case .none: "scope"
         }
     }
 }
@@ -132,6 +142,7 @@ struct ControlsView: View {
             }
         }
         .padding(.horizontal, 6)
+        .glow(.ember)
     }
 
     private func controlButton(_ symbol: String, _ label: String, _ color: Color, action: @escaping () -> Void) -> some View {

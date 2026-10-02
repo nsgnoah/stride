@@ -11,9 +11,7 @@ struct WatchHomeView: View {
                 VStack(alignment: .leading, spacing: 12) {
                     if let next = store.nextRun {
                         let isToday = Calendar.current.isDateInToday(next.day.date)
-                        Text(isToday ? "Today" : next.day.date.formatted(.dateTime.weekday(.wide)))
-                            .font(.footnote).foregroundStyle(.secondary)
-                        WorkoutCard(workout: next.workout)
+                        WorkoutCard(workout: next.workout, caption: isToday ? "Today" : next.day.date.formatted(.dateTime.weekday(.abbreviated)))
                         Button {
                             manager.voiceEnabled = store.voiceCues
                             manager.start(next.workout)
@@ -121,21 +119,34 @@ struct WatchHomeView: View {
 
 struct WorkoutCard: View {
     let workout: Workout
+    var caption: String = ""
+
+    /// Distance runs lead with the number; a tempo or interval session leads with its name.
+    private var leadsWithDistance: Bool {
+        [.easy, .long, .shakeout, .race].contains(workout.type) && workout.plannedMeters > 0
+    }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 4) {
-            Label(workout.title, systemImage: workout.type.symbol)
-                .font(.headline)
-                .foregroundStyle(workout.type.tint)
-            if let pace = workout.mainPace {
-                Text(pace.formatted).font(.footnote).foregroundStyle(.secondary)
+        VStack(alignment: .leading, spacing: 2) {
+            HStack {
+                Eyebrow(text: workout.type.name, symbol: workout.type.symbol, color: workout.type.tint)
+                Spacer()
+                Text(caption).font(.caption2).foregroundStyle(.secondary)
             }
-            Text("~" + Formatting.minutes(workout.estimatedDuration) + " · \(workout.segments.count) parts")
-                .font(.footnote).foregroundStyle(.secondary)
+            if leadsWithDistance {
+                HStack(alignment: .firstTextBaseline, spacing: 4) {
+                    Text(Units.miles(workout.plannedMeters).formatted(.number.precision(.fractionLength(0...1))))
+                        .font(.system(size: 34, weight: .bold, design: .rounded))
+                    Text("miles").font(.footnote.weight(.semibold)).foregroundStyle(.secondary)
+                }
+            } else {
+                Text(workout.title).font(.system(size: 24, weight: .bold, design: .rounded)).minimumScaleFactor(0.7).lineLimit(1)
+            }
+            Text([workout.mainPace?.formatted, "~" + Formatting.minutes(workout.estimatedDuration)].compactMap { $0 }.joined(separator: " · "))
+                .font(.caption2.weight(.medium)).monospacedDigit().foregroundStyle(.secondary)
+                .lineLimit(1).minimumScaleFactor(0.8)
         }
-        .padding()
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .background(.fill.tertiary, in: RoundedRectangle(cornerRadius: 12))
+        .inkCard(glow: workout.type.tint)
     }
 }
 

@@ -8,20 +8,29 @@ struct SummaryView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 10) {
                 if let run = manager.completed {
-                    Text(manager.workout?.title ?? "Run").font(.headline)
-                    row("Distance", Formatting.miles(run.meters, decimals: 2))
-                    row("Time", Formatting.duration(run.durationSeconds))
-                    row("Avg pace", run.averagePace?.formattedPerMile ?? "--")
-                    if let hr = run.averageHeartRate { row("Avg HR", "\(Int(hr)) bpm") }
+                    VStack(alignment: .leading, spacing: 6) {
+                        Eyebrow(text: manager.workout?.title ?? "Run", symbol: "checkmark.circle.fill", color: .jade)
+                        HStack(alignment: .firstTextBaseline, spacing: 4) {
+                            Text(Units.miles(run.meters).formatted(.number.precision(.fractionLength(2))))
+                                .font(.system(size: 42, weight: .bold, design: .rounded))
+                            Text("miles").font(.footnote.weight(.semibold)).foregroundStyle(.secondary)
+                        }
+                        HStack(spacing: 14) {
+                            WatchStat("Time", Formatting.duration(run.durationSeconds))
+                            WatchStat("Pace", run.averagePace?.formatted ?? "--")
+                            if let hr = run.averageHeartRate { WatchStat("Bpm", "\(Int(hr))") }
+                        }
+                    }
+                    .inkCard(glow: .jade)
+
                     if !run.splits.isEmpty {
-                        Divider()
+                        Eyebrow(text: "Splits")
                         ForEach(run.splits, id: \.mile) { split in
                             row("Mile \(split.mile)", Formatting.duration(split.seconds))
                         }
                     }
                     if let post = RoutineLibrary.routine(manager.workout?.postRoutineID) {
-                        Divider()
-                        Text("Cool down").font(.footnote).foregroundStyle(.secondary)
+                        Eyebrow(text: "Cool down", color: .init(hex: 0x35B8C4))
                         ForEach(post.exercises) { ex in
                             HStack {
                                 Text(ex.name).font(.footnote)
@@ -35,9 +44,10 @@ struct SummaryView: View {
                         Connectivity.shared.send(activity: run)
                         manager.discard()
                     } label: {
-                        Text("Save").frame(maxWidth: .infinity)
+                        Text("Save").fontWeight(.semibold).frame(maxWidth: .infinity)
                     }
                     .buttonStyle(.borderedProminent)
+                    .tint(.ember)
                     Button("Discard", role: .destructive) { manager.discard() }
                         .buttonStyle(.bordered)
                 }
