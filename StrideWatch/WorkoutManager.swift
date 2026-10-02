@@ -36,9 +36,9 @@ final class WorkoutManager: NSObject {
     private let voice = VoiceCoach()
     private var lastVoiceAlert: Date = .distantPast
 
-    private func say(_ text: String) {
+    private func say(_ line: VoiceLine) {
         guard voiceEnabled else { return }
-        voice.speak(text)
+        voice.speak(line)
     }
     private var movingUpdates = 0
     private var countdownFired: Set<Int> = []
@@ -151,13 +151,7 @@ final class WorkoutManager: NSObject {
             Task { @MainActor in self?.tick() }
         }
         WKInterfaceDevice.current().play(.start)
-        if let first = workout.segments.first {
-            var line = "Starting \(workout.title). \(first.name), \(first.goalDescription)."
-            if let pace = first.pace { line += " Target \(VoiceCoach.spoken(pace))." }
-            say(line)
-        } else {
-            say("Starting \(workout.title).")
-        }
+        say(VoiceScript.start(workout))
     }
 
     func togglePause() {
@@ -169,14 +163,14 @@ final class WorkoutManager: NSObject {
             resumedAt = nil
             session?.pause()
             WKInterfaceDevice.current().play(.stop)
-            say("Paused.")
+            say(VoiceScript.paused)
         case .paused:
             phase = .running
             resumedAt = .now
             samples.removeAll()
             session?.resume()
             WKInterfaceDevice.current().play(.start)
-            say("Resuming.")
+            say(VoiceScript.resuming)
         default: break
         }
     }
@@ -195,11 +189,7 @@ final class WorkoutManager: NSObject {
             lastAlert = .now // grace period before coaching kicks in
             lastVoiceAlert = .now
             WKInterfaceDevice.current().play(.notification)
-            if let next = self.segment {
-                var line = "\(next.name), \(next.goalDescription)."
-                if let pace = next.pace { line += " Target \(VoiceCoach.spoken(pace)) per mile." }
-                say(line)
-            }
+            if let next = self.segment { say(VoiceScript.segment(next)) }
         } else {
             end()
         }
@@ -237,7 +227,7 @@ final class WorkoutManager: NSObject {
             }
         }
         WKInterfaceDevice.current().play(.success)
-        say("Workout complete. \(VoiceCoach.spokenDistance(distance)) in \(VoiceCoach.spokenDuration(accumulatedBeforePause)).")
+        say(VoiceScript.complete(meters: distance, seconds: accumulatedBeforePause))
     }
 
     func discard() {
@@ -356,7 +346,7 @@ final class WorkoutManager: NSObject {
             lastSplit = split
             splitBannerUntil = Date.now.addingTimeInterval(8)
             WKInterfaceDevice.current().play(.notification)
-            say("Mile \(mile). \(VoiceCoach.spoken(split.seconds)).")
+            say(VoiceScript.split(mile: mile, seconds: split.seconds))
         }
     }
 
@@ -386,7 +376,7 @@ final class WorkoutManager: NSObject {
 
         // Back in the window after being told off: one quiet confirmation.
         if changed, newCoaching == .onPace, Date.now.timeIntervalSince(lastVoiceAlert) < 90 {
-            say("On pace.")
+            say(VoiceScript.onPace)
         }
         // Haptic: immediately on a change, then every 20 s while still off pace.
         // Voice: on the change, then every 60 s so it nudges without nagging.
@@ -397,10 +387,7 @@ final class WorkoutManager: NSObject {
         }
         if changed || Date.now.timeIntervalSince(lastVoiceAlert) > 60 {
             lastVoiceAlert = .now
-            let current = VoiceCoach.spoken(pace)
-            say(newCoaching == .speedUp
-                ? "Speed up. You're at \(current), target \(VoiceCoach.spoken(target))."
-                : "Slow down. You're at \(current), target \(VoiceCoach.spoken(target)).")
+            say(VoiceScript.nudge(newCoaching == .speedUp ? .speedUp : .slowDown, current: pace, target: target))
         }
     }
 

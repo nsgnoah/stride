@@ -70,8 +70,13 @@ targets:
     platform: watchOS
     sources:
       - path: StrideWatch
+        excludes: ["Voice"]
       - path: Shared
       - path: StrideWatch/PrivacyInfo.xcprivacy
+        buildPhase: resources
+      # The coach's recorded clips, kept as a folder so the bundle has Voice/<clip>.m4a.
+      - path: StrideWatch/Voice
+        type: folder
         buildPhase: resources
     dependencies:
       - target: StrideWatchWidget
