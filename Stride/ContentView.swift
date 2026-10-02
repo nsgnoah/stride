@@ -64,20 +64,37 @@ struct SettingsView: View {
             List {
                 if store.plan == nil {
                     Section {
-                        Button("Build a training plan…") { editing = true }
-                    } header: {
-                        Text("Plan")
-                    } footer: {
-                        Text("You're in free-run mode: no schedule, just tracking. A plan adds a weekly schedule and pace coaching on the watch.")
+                        VStack(alignment: .leading, spacing: 14) {
+                            CardEyebrow(text: "Free-run mode")
+                            Text("Just running").font(.system(size: 34, weight: .bold, design: .rounded))
+                            Text("No schedule, just tracking. A plan adds a weekly schedule and pace coaching on the watch.")
+                                .font(.subheadline).foregroundStyle(.white.opacity(0.7))
+                            Button("Build a training plan…") { editing = true }
+                                .buttonStyle(.bordered).buttonBorderShape(.capsule).controlSize(.small).tint(.white)
+                        }
+                        .inkCard(glow: .ember)
                     }
                 }
                 if let profile = store.profile, let plan = store.plan {
-                    Section("Plan") {
-                        LabeledContent("Goal", value: plan.goal.name)
-                        LabeledContent(profile.hasRaceDate ? "Race" : "Goal day", value: plan.raceDate.formatted(date: .abbreviated, time: .omitted))
-                        LabeledContent("Run days", value: profile.runDays.isEmpty ? "\(profile.runCount) a week" : profile.runDays.sorted().map(\.shortName).joined(separator: ", "))
-                        LabeledContent("Lifting days", value: profile.strengthDays.isEmpty ? "None" : profile.strengthDays.sorted().map(\.shortName).joined(separator: ", "))
-                        Button("Adjust plan…") { editing = true }
+                    Section {
+                        VStack(alignment: .leading, spacing: 14) {
+                            HStack {
+                                CardEyebrow(text: "Your plan")
+                                Spacer()
+                                Text("\(profile.hasRaceDate ? "Race" : "Goal day") · \(plan.raceDate.formatted(date: .abbreviated, time: .omitted))")
+                                    .font(.caption.weight(.medium)).foregroundStyle(.white.opacity(0.6))
+                            }
+                            Text(plan.goal.name).font(.system(size: 44, weight: .bold, design: .rounded))
+                            HStack(spacing: 22) {
+                                CardStat("Run days", profile.runDays.isEmpty ? "\(profile.runCount) a week" : profile.runDays.sorted().map(\.shortName).joined(separator: ", "))
+                                CardStat("Lifting", profile.strengthDays.isEmpty ? "None" : profile.strengthDays.sorted().map(\.shortName).joined(separator: ", "))
+                            }
+                            Button("Adjust plan…") { editing = true }
+                                .buttonStyle(.bordered).buttonBorderShape(.capsule).controlSize(.small).tint(.white)
+                        }
+                        .inkCard(glow: .ember)
+                    }
+                    Section {
                         Button("Stop following a plan", role: .destructive) { confirmDrop = true }
                     }
                     Section {

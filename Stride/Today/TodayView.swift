@@ -170,9 +170,9 @@ struct RunHero: View {
             }
 
             HStack(spacing: 22) {
-                if let pace = workout.mainPace { stat("Pace", pace.formatted) }
-                stat("Time", "~" + Formatting.minutes(workout.estimatedDuration))
-                if !leadsWithDistance, workout.plannedMeters > 0 { stat("Distance", Formatting.miles(workout.plannedMeters)) }
+                if let pace = workout.mainPace { CardStat("Pace", pace.formatted) }
+                CardStat("Time", "~" + Formatting.minutes(workout.estimatedDuration))
+                if !leadsWithDistance, workout.plannedMeters > 0 { CardStat("Distance", Formatting.miles(workout.plannedMeters)) }
             }
 
             if isDone {
@@ -185,29 +185,10 @@ struct RunHero: View {
                     .buttonBorderShape(.capsule)
             }
         }
-        .foregroundStyle(.white)
-        .padding(20)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .background {
-            ZStack {
-                LinearGradient(colors: [.ink, .inkDeep], startPoint: .top, endPoint: .bottom)
-                // The same glow as the icon, in this workout's colour.
-                RadialGradient(colors: [workout.type.tint.opacity(0.45), .clear], center: .topTrailing, startRadius: 0, endRadius: 260)
-            }
-        }
-        .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
-        .overlay { RoundedRectangle(cornerRadius: 24, style: .continuous).strokeBorder(.white.opacity(0.08)) }
+        // The glow takes this workout's colour.
+        .inkCard(glow: workout.type.tint)
         // The whole card opens the workout; the buttons on it still work on their own.
         .background(NavigationLink(value: workout) { EmptyView() }.opacity(0))
-        .listRowInsets(EdgeInsets())
-        .listRowBackground(Color.clear)
-    }
-
-    private func stat(_ label: String, _ value: String) -> some View {
-        VStack(alignment: .leading, spacing: 2) {
-            Text(label.uppercased()).font(.caption2.weight(.semibold)).tracking(0.6).foregroundStyle(.white.opacity(0.5))
-            Text(value).font(.subheadline.weight(.semibold)).monospacedDigit()
-        }
     }
 }
 

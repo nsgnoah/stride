@@ -8,6 +8,10 @@ struct ProgressTabView: View {
     var body: some View {
         NavigationStack {
             List {
+                Section {
+                    WeekCard()
+                }
+
                 if let plan = store.plan {
                     Section("Weekly miles — planned vs. run") {
                         MileageChart(plan: plan)
@@ -23,26 +27,9 @@ struct ProgressTabView: View {
                         }
                     }
 
-                    Section("This week") {
-                        if let week = store.thisWeek {
-                            let acts = store.activities(in: week)
-                            LabeledContent("Runs", value: "\(acts.filter { $0.type.isRun }.count) of \(week.runCount)")
-                            LabeledContent("Miles", value: "\(Formatting.miles(acts.reduce(0) { $0 + $1.meters }, decimals: 1)) of \(Formatting.miles(week.plannedMeters, decimals: 0))")
-                            LabeledContent("Lifts", value: "\(acts.filter { $0.type == .strength }.count)")
-                            LabeledContent("Mobility", value: "\(acts.filter { $0.type == .mobility }.count)")
-                            LabeledContent("Time moving", value: Formatting.duration(acts.reduce(0) { $0 + $1.durationSeconds }))
-                        }
-                    }
                 }
 
                 if store.plan == nil {
-                    let week = store.activitiesThisCalendarWeek
-                    Section("This week") {
-                        LabeledContent("Runs", value: "\(week.filter { $0.type.isRun }.count)")
-                        LabeledContent("Miles", value: Formatting.miles(week.reduce(0) { $0 + $1.meters }, decimals: 1))
-                        LabeledContent("Lifts", value: "\(week.filter { $0.type == .strength }.count)")
-                        LabeledContent("Time moving", value: Formatting.duration(week.reduce(0) { $0 + $1.durationSeconds }))
-                    }
                     if runs.count >= 2 {
                         Section("Pace over time") {
                             PaceChart(runs: runs, easyRange: nil)
@@ -92,6 +79,52 @@ struct ProgressTabView: View {
 
     private var runs: [ActivityRecord] {
         store.activities.filter { $0.type.isRun && $0.meters > 400 }.sorted { $0.date < $1.date }
+    }
+}
+
+/// This week at a glance: miles run against the plan, and what else got done.
+struct WeekCard: View {
+    @Environment(AppStore.self) private var store
+
+    var body: some View {
+        let week = store.thisWeek
+        let acts = week.map { store.activities(in: $0) } ?? store.activitiesThisCalendarWeek
+        let runs = acts.filter { $0.type.isRun }
+        let miles = Units.miles(runs.reduce(0) { $0 + $1.meters })
+        let planned = week.map { Units.miles($0.plannedMeters) }
+
+        VStack(alignment: .leading, spacing: 14) {
+            HStack {
+                CardEyebrow(text: "This week")
+                Spacer()
+                if let week, let total = store.plan?.weeks.count {
+                    Text("Week \(week.number) of \(total)").font(.caption.weight(.medium)).foregroundStyle(.white.opacity(0.6))
+                }
+            }
+            HStack(alignment: .firstTextBaseline, spacing: 6) {
+                Text(miles.formatted(.number.precision(.fractionLength(1))))
+                    .font(.system(size: 64, weight: .bold, design: .rounded))
+                Text(planned.map { "of \($0.formatted(.number.precision(.fractionLength(0...1)))) miles" } ?? "miles")
+                    .font(.title3.weight(.semibold)).foregroundStyle(.white.opacity(0.6))
+            }
+            if let planned, planned > 0 {
+                GeometryReader { geo in
+                    ZStack(alignment: .leading) {
+                        Capsule().fill(.white.opacity(0.12))
+                        Capsule().fill(.stride).frame(width: max(8, geo.size.width * min(1, miles / planned)))
+                            .opacity(miles > 0 ? 1 : 0)
+                    }
+                }
+                .frame(height: 8)
+            }
+            HStack(spacing: 22) {
+                CardStat("Runs", week.map { "\(runs.count) of \($0.runCount)" } ?? "\(runs.count)")
+                CardStat("Time", Formatting.duration(acts.reduce(0) { $0 + $1.durationSeconds }))
+                CardStat("Lifts", "\(acts.filter { $0.type == .strength }.count)")
+                CardStat("Mobility", "\(acts.filter { $0.type == .mobility }.count)")
+            }
+        }
+        .inkCard(glow: .ember)
     }
 }
 

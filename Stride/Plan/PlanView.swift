@@ -24,7 +24,7 @@ struct PlanView: View {
                     Section {
                         HStack(alignment: .lastTextBaseline) {
                             VStack(alignment: .leading, spacing: 4) {
-                                Text("THE GOAL").font(.caption.weight(.bold)).tracking(0.8).foregroundStyle(.stride)
+                                CardEyebrow(text: "The goal")
                                 Text(plan.goal.name).font(.system(size: 34, weight: .bold, design: .rounded))
                                 Text(plan.raceDate.formatted(.dateTime.weekday(.wide).month().day()))
                                     .font(.subheadline).foregroundStyle(.white.opacity(0.6))
@@ -35,17 +35,7 @@ struct PlanView: View {
                                 Text("days to go").font(.caption.weight(.medium)).foregroundStyle(.white.opacity(0.6))
                             }
                         }
-                        .foregroundStyle(.white)
-                        .padding(20)
-                        .background {
-                            ZStack {
-                                LinearGradient(colors: [.ink, .inkDeep], startPoint: .top, endPoint: .bottom)
-                                RadialGradient(colors: [Color.ember.opacity(0.4), .clear], center: .topTrailing, startRadius: 0, endRadius: 240)
-                            }
-                        }
-                        .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
-                        .listRowInsets(EdgeInsets())
-                        .listRowBackground(Color.clear)
+                        .inkCard(glow: .ember)
                     }
 
                     ForEach(plan.weeks) { week in
