@@ -57,6 +57,6 @@ Tests: `xcodebuild test -scheme Stride -destination 'platform=iOS Simulator,name
 
 ## The coach's voice
 
-The watch only ships Apple's compact voices, so spoken cues are stitched from short recorded clips in `StrideWatch/Voice/` (about 400: numbers, units, segment names, a handful of phrases). `Shared/Voice/VoiceScript.swift` decides what is said and which clips say it; a cue with any clip missing is read by the system voice instead.
+The watch only ships Apple's compact voices, so spoken cues are stitched from short recorded clips in `StrideWatch/Voice/` (about 1,150: paces, distances, times, segment names, a handful of phrases). `Shared/Voice/VoiceScript.swift` decides what is said and which clips say it; a cue with any clip missing is read by the system voice instead.
 
-`Tools/render_voice.py` records the clips with an ElevenLabs voice (`ELEVENLABS_API_KEY` and `ELEVENLABS_VOICE_ID` in the environment or a git-ignored `.env`), trims and levels them, and encodes them as AAC. `--audition` records just enough for a few whole cues and writes them to `build/voice-samples/`; `--render` records everything that's missing (about 5,800 characters). After changing what the coach says, run `--manifest` and the tests, which check every cue against the clip list.
+`Tools/render_voice.py` records the clips with an ElevenLabs voice (`ELEVENLABS_API_KEY` and `ELEVENLABS_VOICE_ID` in the environment or a git-ignored `.env`), trims and levels them, and encodes them as AAC. `--audition` records just enough for a few whole cues and writes them to `build/voice-samples/`; `--render` records everything that's missing (about 24,500 characters). After changing what the coach says, run `--manifest` and the tests, which check every cue against the clip list.

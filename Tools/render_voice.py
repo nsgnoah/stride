@@ -17,12 +17,14 @@ Nothing else: standard library only.
 """
 
 import argparse
+import concurrent.futures
 import json
 import os
 import re
 import subprocess
 import sys
 import tempfile
+import time
 import urllib.error
 import urllib.request
 import wave
@@ -33,8 +35,10 @@ VOICE_DIR = ROOT / "StrideWatch" / "Voice"
 MANIFEST = VOICE_DIR / "manifest.json"
 SAMPLE_DIR = ROOT / "build" / "voice-samples"
 
-MODEL = "eleven_multilingual_v2"
-SETTINGS = {"stability": 0.6, "similarity_boost": 0.85, "style": 0.0, "use_speaker_boost": True}
+MODEL = "eleven_v4"
+# Lower stability and some style: more energy, a coach rather than a narrator.
+SETTINGS = {"stability": 0.35, "similarity_boost": 0.85, "style": 0.35, "use_speaker_boost": True}
+WORKERS = 3  # concurrent requests the plan allows
 RATE = 44100
 TARGET_MEAN_DB = -20.0  # every clip lands at the same loudness so joins don't jump
 PEAK_CEILING_DB = -1.0
@@ -68,15 +72,12 @@ def inventory():
         clips[name] = {"text": text, "prev": prev, "next": next}
 
     # Coaching
-    add("speed_up", "Speed up.")
+    add("speed_up", "Speed up!")
     add("slow_down", "Slow down.")
-    add("on_pace", "On pace.")
+    add("on_pace", "Nice, on pace!")
     add("paused", "Paused.")
-    add("resuming", "Resuming.")
-    add("complete", "Workout complete.")
-    add("youre_at", "You're at", prev="Slow down.", next=" eleven ten.")
-    add("target", "Target", prev="You're at eleven ten.", next=" eleven thirty to twelve fifteen.")
-    add("to", "to", prev="Target eleven thirty", next=" twelve fifteen.")
+    add("resuming", "Resuming. Let's go!")
+    add("complete", "Workout complete! Great job.")
 
     # Workouts and segments
     add("w_easy", "Easy run.")
@@ -85,7 +86,7 @@ def inventory():
     add("w_tempo", "Tempo run.")
     add("w_intervals", "Intervals.")
     add("w_shakeout", "Shakeout run.")
-    add("w_race", "Race day.")
+    add("w_race", "Race day!")
     add("w_free", "Free run.")
     add("seg_walk_drills", "Walk and drills.")
     add("seg_run", "Run.")
@@ -103,32 +104,35 @@ def inventory():
         for i in range(1, n + 1):
             add(f"rep_{i}_{n}", f"Rep {words(i)} of {words(n)}.")
 
-    # Paces: minutes then seconds, "eleven" + "thirty-eight."
-    for m in range(4, 30):
-        add(f"pm_{m}", words(m), prev="You're at", next=" thirty-eight.")
-    for s in range(60):
-        said = "flat" if s == 0 else f"oh {words(s)}" if s < 10 else words(s)
-        add(f"ps_{s}", said + ".", prev="You're at eleven")
+    # Paces, to the nearest five seconds, each a whole phrase so nothing is spliced mid-breath.
+    for seconds in range(240, 1200, 5):
+        m, sec = divmod(seconds, 60)
+        pace = f"{words(m)} " + ("flat" if sec == 0 else f"oh {words(sec)}" if sec < 10 else words(sec))
+        add(f"at_{seconds}", f"You're at {pace}.", prev="Slow down.")
+        add(f"tg_{seconds}", f"Target, {pace}", prev="Easy run. Two miles.", next=" to twelve thirty-five.")
+        add(f"to_{seconds}", f"to {pace}.", prev="Target, eleven forty")
 
-    # Distances
+    # Distances: track reps in meters, everything else in miles to the tenth.
     for m in (200, 400, 600, 800, 1000, 1200, 1600):
         add(f"m_{m}", cap(f"{words(m)} meters."))
+    for tenths in range(1, 310):
+        n, t = divmod(tenths, 10)
+        if t == 0:
+            said = f"{words(n)} {'mile' if n == 1 else 'miles'}"
+        elif t == 5:
+            said = "half a mile" if n == 0 else f"{words(n)} and a half miles"
+        else:
+            said = f"{words(n)} point {words(t)} miles"
+        add(f"mi_{tenths}", cap(said + "."))
     for n in range(1, 31):
-        add(f"mi_{n}", cap(f"{words(n)} {'mile' if n == 1 else 'miles'}."))
-        add(f"n_{n}", cap(words(n)), next=" point one miles.")
         add(f"mile_{n}", f"Mile {words(n)}.")
-    add("mi_0_5", "Half a mile.")
-    for n in range(1, 21):
-        add(f"mi_{n}_5", cap(f"{words(n)} and a half miles."))
-    for t in range(1, 10):
-        add(f"pt_{t}", f"point {words(t)} miles.", prev="Three")
-        if t != 5:
-            add(f"mi_0_{t}", cap(f"zero point {words(t)} miles."))
 
-    # Durations
+    # Durations. "minc" leads into the seconds: "Eleven minutes," + "forty-two seconds."
     for n in range(1, 60):
-        add(f"min_{n}", cap(f"{words(n)} {'minute' if n == 1 else 'minutes'}."))
-        add(f"sec_{n}", cap(f"{words(n)} {'second' if n == 1 else 'seconds'}."))
+        unit = "minute" if n == 1 else "minutes"
+        add(f"min_{n}", cap(f"{words(n)} {unit}."))
+        add(f"minc_{n}", cap(f"{words(n)} {unit},"), next=" forty-two seconds.")
+        add(f"sec_{n}", f"{words(n)} {'second' if n == 1 else 'seconds'}.", prev="Eleven minutes,")
     add("sec_90", "Ninety seconds.")
     for n in range(1, 7):
         add(f"hr_{n}", cap(f"{words(n)} {'hour' if n == 1 else 'hours'},"), next=" twelve minutes.")
@@ -138,11 +142,12 @@ def inventory():
 
 # A few whole cues, as the watch assembles them: (clip, pause after it in seconds).
 SAMPLES = {
-    "1-start": [("w_easy", .3), ("mi_2", .3), ("seg_walk_drills", .3), ("min_4", .3)],
-    "2-segment": [("w_easy", .3), ("mi_2", .3), ("target", .05), ("pm_11", .02), ("ps_38", .08), ("to", .05), ("pm_12", .02), ("ps_33", .3)],
-    "3-slow-down": [("slow_down", .3), ("youre_at", .05), ("pm_10", .02), ("ps_55", .3), ("target", .05), ("pm_11", .02), ("ps_38", .08), ("to", .05), ("pm_12", .02), ("ps_33", .3)],
-    "4-mile-split": [("mile_2", .3), ("pm_11", .02), ("ps_42", .3)],
-    "5-finish": [("complete", .3), ("n_3", .02), ("pt_1", .3), ("min_36", .1), ("sec_12", .3)],
+    "1-start": [("w_easy", .3), ("mi_20", .3), ("seg_walk_drills", .3), ("min_4", .3)],
+    "2-segment": [("w_easy", .3), ("mi_20", .3), ("tg_700", .06), ("to_755", .3)],
+    "3-slow-down": [("slow_down", .3), ("at_655", .3), ("tg_700", .06), ("to_755", .3)],
+    "4-mile-split": [("mile_2", .3), ("minc_11", .08), ("sec_42", .3)],
+    "5-finish": [("complete", .3), ("mi_31", .3), ("minc_36", .08), ("sec_12", .3)],
+    "6-speed-up": [("speed_up", .3), ("at_790", .3), ("tg_700", .06), ("to_755", .3)],
 }
 
 
@@ -161,8 +166,8 @@ def synthesize(clip, key, voice):
         data=json.dumps(body).encode(),
         headers={"xi-api-key": key, "Content-Type": "application/json", "Accept": "audio/mpeg"},
     )
-    with urllib.request.urlopen(request, timeout=60) as response:
-        return response.read()
+    with urllib.request.urlopen(request, timeout=120) as response:
+        return response.read(), int(response.headers.get("character-cost") or 0)
 
 
 def finish(mp3, destination):
@@ -177,7 +182,7 @@ def finish(mp3, destination):
         peak = float(re.search(r"max_volume: (-?[\d.]+) dB", stats).group(1))
         gain = min(TARGET_MEAN_DB - mean, PEAK_CEILING_DB - peak)
         run("ffmpeg", "-y", "-i", str(trimmed), "-af", f"volume={gain:.2f}dB,afade=t=in:d=0.005", str(levelled))
-        run("afconvert", "-f", "m4af", "-d", "aac", "-b", "64000", str(levelled), str(destination))
+        run("afconvert", "-f", "m4af", "-d", "aac", "-b", "48000", str(levelled), str(destination))
 
 
 def credential(name):
@@ -204,12 +209,36 @@ def render(only, force):
     VOICE_DIR.mkdir(parents=True, exist_ok=True)
     todo = [n for n in names if force or not (VOICE_DIR / f"{n}.m4a").exists()]
     print(f"{len(todo)} to record ({sum(len(clips[n]['text']) for n in todo)} characters), {len(names) - len(todo)} already there.")
-    for i, name in enumerate(todo, 1):
-        try:
-            finish(synthesize(clips[name], key, voice), VOICE_DIR / f"{name}.m4a")
-        except urllib.error.HTTPError as error:
-            sys.exit(f"ElevenLabs refused '{name}': {error.code} {error.read().decode(errors='replace')[:300]}")
-        print(f"  {i}/{len(todo)} {name}: {clips[name]['text']}")
+
+    def record(name):
+        for attempt in range(4):
+            try:
+                audio, cost = synthesize(clips[name], key, voice)
+                finish(audio, VOICE_DIR / f"{name}.m4a")
+                return cost
+            except urllib.error.HTTPError as error:
+                detail = error.read().decode(errors="replace")[:300]
+                if error.code not in (429, 500, 502, 503) or attempt == 3:
+                    raise RuntimeError(f"ElevenLabs refused '{name}': {error.code} {detail}")
+            except (urllib.error.URLError, TimeoutError):
+                if attempt == 3:
+                    raise
+            time.sleep(2 * (attempt + 1))
+
+    spent, failed = 0, []
+    with concurrent.futures.ThreadPoolExecutor(WORKERS) as pool:
+        jobs = {pool.submit(record, name): name for name in todo}
+        for i, job in enumerate(concurrent.futures.as_completed(jobs), 1):
+            name = jobs[job]
+            try:
+                spent += job.result()
+            except Exception as error:  # keep going; report what's missing at the end
+                failed.append(name)
+                print(f"  {name}: {error}")
+            if i % 50 == 0 or i == len(todo):
+                print(f"  {i}/{len(todo)} recorded, {spent} credits so far", flush=True)
+    if failed:
+        sys.exit(f"{len(failed)} clips failed: {', '.join(failed[:20])}")
 
 
 def samples():
@@ -243,6 +272,9 @@ def main():
 
     if args.manifest:
         VOICE_DIR.mkdir(parents=True, exist_ok=True)
+        for stale in VOICE_DIR.glob("*.m4a"):
+            if stale.stem not in inventory():
+                stale.unlink()
         MANIFEST.write_text(json.dumps({name: clip["text"] for name, clip in inventory().items()}, indent=1) + "\n")
         print(f"{len(inventory())} clips, {sum(len(c['text']) for c in inventory().values())} characters -> {MANIFEST.relative_to(ROOT)}")
     if args.audition:

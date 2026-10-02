@@ -64,25 +64,24 @@ enum VoiceScript {
 
     static func nudge(_ nudge: Nudge, current: Pace, target range: PaceRange) -> VoiceLine {
         let lead = nudge == .speedUp
-            ? VoiceLine.Part(clips: ["speed_up"], text: "Speed up.")
+            ? VoiceLine.Part(clips: ["speed_up"], text: "Speed up!")
             : VoiceLine.Part(clips: ["slow_down"], text: "Slow down.")
-        let at = VoiceLine.Part(clips: ["youre_at"], text: "You're at", pause: 0.05)
-        return VoiceLine(parts: [lead, at, pace(current, ending: ".")] + target(range))
+        return VoiceLine(parts: [lead, pace(current, clip: "at", text: "You're at %@.")] + target(range))
     }
 
-    static let onPace = VoiceLine(parts: [.init(clips: ["on_pace"], text: "On pace.")])
+    static let onPace = VoiceLine(parts: [.init(clips: ["on_pace"], text: "Nice, on pace!")])
     static let paused = VoiceLine(parts: [.init(clips: ["paused"], text: "Paused.")])
-    static let resuming = VoiceLine(parts: [.init(clips: ["resuming"], text: "Resuming.")])
+    static let resuming = VoiceLine(parts: [.init(clips: ["resuming"], text: "Resuming. Let's go!")])
 
     static func split(mile: Int, seconds: TimeInterval) -> VoiceLine {
         let marker = (1...30).contains(mile)
             ? VoiceLine.Part(clips: ["mile_\(mile)"], text: "Mile \(mile).")
             : .unrecorded("Mile \(mile).")
-        return VoiceLine(parts: [marker, pace(seconds, ending: ".")])
+        return VoiceLine(parts: [marker] + duration(seconds, exact: true))
     }
 
     static func complete(meters: Double, seconds: TimeInterval) -> VoiceLine {
-        let done = VoiceLine.Part(clips: ["complete"], text: "Workout complete.")
+        let done = VoiceLine.Part(clips: ["complete"], text: "Workout complete! Great job.")
         return VoiceLine(parts: [done] + distance(meters) + duration(seconds, exact: true))
     }
 
@@ -101,7 +100,7 @@ enum VoiceScript {
         case .tempo: return .init(clips: ["w_tempo"], text: "Tempo run.")
         case .intervals: return .init(clips: ["w_intervals"], text: "Intervals.")
         case .shakeout: return .init(clips: ["w_shakeout"], text: "Shakeout run.")
-        case .race: return .init(clips: ["w_race"], text: "Race day.")
+        case .race: return .init(clips: ["w_race"], text: "Race day!")
         case .strength, .mobility, .rest: return .unrecorded("Starting \(workout.title).")
         }
     }
@@ -140,10 +139,8 @@ enum VoiceScript {
     private static func target(_ range: PaceRange?) -> [VoiceLine.Part] {
         guard let range else { return [] }
         return [
-            .init(clips: ["target"], text: "Target", pause: 0.05),
-            pace(range.fast, ending: "", pause: 0.08),
-            .init(clips: ["to"], text: "to", pause: 0.05),
-            pace(range.slow, ending: "."),
+            pace(range.fast, clip: "tg", text: "Target %@", pause: 0.06),
+            pace(range.slow, clip: "to", text: "to %@."),
         ]
     }
 
@@ -156,13 +153,15 @@ enum VoiceScript {
         return s < 10 ? "\(m) oh \(s)" : "\(m) \(s)"
     }
 
-    private static func pace(_ pace: Pace, ending: String, pause: TimeInterval = 0.3) -> VoiceLine.Part {
-        let text = spoken(pace) + ending
-        guard pace.isFinite else { return .unrecorded(text) }
-        let total = Int(pace.rounded())
-        let m = total / 60, s = total % 60
-        guard (4...29).contains(m) else { return .unrecorded(text) }
-        return .init(clips: ["pm_\(m)", "ps_\(s)"], text: text, pause: pause)
+    /// Paces are spoken to the nearest five seconds — GPS pace isn't steadier than that —
+    /// and each is recorded as a whole phrase ("You're at eleven ten.") so nothing is
+    /// spliced mid-breath. Recorded from 4:00 to 19:55 a mile.
+    private static func pace(_ pace: Pace, clip: String, text: String, pause: TimeInterval = 0.3) -> VoiceLine.Part {
+        guard pace.isFinite, pace > 0, pace < 3600 else { return .unrecorded(String(format: text, "an unknown pace")) }
+        let seconds = Int((pace / 5).rounded()) * 5
+        let words = String(format: text, spoken(Double(seconds)))
+        guard (240...1195).contains(seconds) else { return .unrecorded(words) }
+        return .init(clips: ["\(clip)_\(seconds)"], text: words, pause: pause)
     }
 
     private static func distance(_ meters: Double) -> [VoiceLine.Part] {
@@ -174,12 +173,10 @@ enum VoiceScript {
         let tenths = Int((Units.miles(meters) * 10).rounded())
         let n = tenths / 10, t = tenths % 10
         let text = t == 0 ? "\(n) \(n == 1 ? "mile" : "miles")." : "\(n).\(t) miles."
-        switch (n, t) {
-        case (0, 0): return []
-        case (1...30, 0): return [.init(clips: ["mi_\(n)"], text: text)]
-        case (0...20, 5): return [.init(clips: ["mi_\(n)_5"], text: text)]
-        case (0, _): return [.init(clips: ["mi_0_\(t)"], text: text)]
-        case (1...30, _): return [.init(clips: ["n_\(n)", "pt_\(t)"], text: text)]
+        switch tenths {
+        case ..<1: return []
+        // Every tenth up to 30.9 miles is its own clip.
+        case 1...309: return [.init(clips: ["mi_\(tenths)"], text: text)]
         default: return [.unrecorded(text)]
         }
     }
@@ -195,7 +192,9 @@ enum VoiceScript {
             parts.append((1...6).contains(h) ? .init(clips: ["hr_\(h)"], text: text, pause: 0.1) : .unrecorded(text))
         }
         if m > 0 {
-            parts.append(.init(clips: ["min_\(m)"], text: "\(m) \(m == 1 ? "minute" : "minutes")\(h == 0 && s > 0 ? "," : ".")", pause: h == 0 && s > 0 ? 0.1 : 0.3))
+            // "Eleven minutes," leading into the seconds is recorded separately from "Eleven minutes."
+            let leadsOn = h == 0 && s > 0
+            parts.append(.init(clips: [leadsOn ? "minc_\(m)" : "min_\(m)"], text: "\(m) \(m == 1 ? "minute" : "minutes")\(leadsOn ? "," : ".")", pause: leadsOn ? 0.08 : 0.3))
         }
         // Past an hour, seconds are noise.
         if h == 0, s > 0 {
