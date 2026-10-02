@@ -44,7 +44,7 @@ struct WorkoutRow: View {
             }
             Spacer()
             if store.isCompleted(workout) {
-                Image(systemName: "checkmark.circle.fill").foregroundStyle(.green)
+                Image(systemName: "checkmark.circle.fill").foregroundStyle(Color.jade)
             }
         }
     }

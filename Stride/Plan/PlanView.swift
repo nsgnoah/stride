@@ -22,18 +22,30 @@ struct PlanView: View {
                 }
                 if let plan = store.plan {
                     Section {
-                        HStack {
-                            VStack(alignment: .leading) {
-                                Text(plan.goal.name).font(.title2.bold())
+                        HStack(alignment: .lastTextBaseline) {
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text("THE GOAL").font(.caption.weight(.bold)).tracking(0.8).foregroundStyle(.stride)
+                                Text(plan.goal.name).font(.system(size: 34, weight: .bold, design: .rounded))
                                 Text(plan.raceDate.formatted(.dateTime.weekday(.wide).month().day()))
-                                    .foregroundStyle(.secondary)
+                                    .font(.subheadline).foregroundStyle(.white.opacity(0.6))
                             }
                             Spacer()
-                            VStack(alignment: .trailing) {
-                                Text("\(daysToRace)").font(.title2.bold())
-                                Text("days to go").foregroundStyle(.secondary)
+                            VStack(alignment: .trailing, spacing: 0) {
+                                Text("\(daysToRace)").font(.system(size: 44, weight: .bold, design: .rounded))
+                                Text("days to go").font(.caption.weight(.medium)).foregroundStyle(.white.opacity(0.6))
                             }
                         }
+                        .foregroundStyle(.white)
+                        .padding(20)
+                        .background {
+                            ZStack {
+                                LinearGradient(colors: [.ink, .inkDeep], startPoint: .top, endPoint: .bottom)
+                                RadialGradient(colors: [Color.ember.opacity(0.4), .clear], center: .topTrailing, startRadius: 0, endRadius: 240)
+                            }
+                        }
+                        .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
+                        .listRowInsets(EdgeInsets())
+                        .listRowBackground(Color.clear)
                     }
 
                     ForEach(plan.weeks) { week in
@@ -88,7 +100,7 @@ struct WeekHeader: View {
                     Text("Week \(week.number)").font(.headline)
                     if isCurrent {
                         Text("NOW").font(.caption2.bold()).padding(.horizontal, 6).padding(.vertical, 2)
-                            .background(.tint, in: Capsule()).foregroundStyle(.white)
+                            .background(.stride, in: Capsule()).foregroundStyle(.white)
                     }
                 }
                 Text(week.focus).font(.subheadline).foregroundStyle(.secondary)
@@ -144,7 +156,7 @@ struct DayRow: View {
                                 Text(workout.title)
                                 Spacer()
                                 if store.isCompleted(workout) {
-                                    Image(systemName: "checkmark.circle.fill").foregroundStyle(.green)
+                                    Image(systemName: "checkmark.circle.fill").foregroundStyle(Color.jade)
                                 } else if let pace = workout.mainPace {
                                     Text(pace.fast.formatted + "–" + pace.slow.formatted).font(.caption).foregroundStyle(.secondary)
                                 }

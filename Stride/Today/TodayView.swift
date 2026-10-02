@@ -53,14 +53,16 @@ struct TodayView: View {
                 }
 
                 if let today = store.today {
-                    Section("Today") {
-                        ForEach(today.workouts) { workout in
-                            if workout.type.isRun, workout.type != .race, !store.isCompleted(workout), store.plan?.isSkipped(workout) != true {
-                                VStack(alignment: .leading, spacing: 8) {
-                                    NavigationLink(value: workout) { WorkoutRow(workout: workout) }
-                                    RescheduleButtons(workout: workout, day: today)
-                                }
-                            } else {
+                    let run = today.workouts.first { $0.type.isRun }
+                    if let run {
+                        Section {
+                            RunHero(workout: run, day: today, caption: "Today")
+                        }
+                    }
+                    let others = today.workouts.filter { $0.id != run?.id }
+                    if !others.isEmpty {
+                        Section(run == nil ? "Today" : "Also today") {
+                            ForEach(others) { workout in
                                 NavigationLink(value: workout) { WorkoutRow(workout: workout) }
                             }
                         }
@@ -97,15 +99,9 @@ struct TodayView: View {
                 }
 
                 if let next = store.nextRun, !Calendar.current.isDateInToday(next.day.date) {
-                    Section("Next run · \(next.day.date.formatted(.dateTime.weekday(.wide)))") {
-                        if next.workout.type == .race {
-                            NavigationLink(value: next.workout) { WorkoutRow(workout: next.workout) }
-                        } else {
-                            VStack(alignment: .leading, spacing: 8) {
-                                NavigationLink(value: next.workout) { WorkoutRow(workout: next.workout) }
-                                RescheduleButtons(workout: next.workout, day: next.day)
-                            }
-                        }
+                    Section {
+                        RunHero(workout: next.workout, day: next.day,
+                                caption: "Next run · \(next.day.date.formatted(.dateTime.weekday(.wide)))")
                     }
                 }
 
@@ -132,6 +128,86 @@ struct TodayView: View {
     /// This week, or the first week if the plan hasn't started yet.
     private var displayWeek: PlannedWeek? {
         store.thisWeek ?? store.plan?.weeks.first { $0.startDate > .now }
+    }
+}
+
+/// The day's run as a card: what it is, how far, how fast, and a way to move it.
+struct RunHero: View {
+    @Environment(AppStore.self) private var store
+    let workout: Workout
+    let day: PlannedDay
+    let caption: String
+
+    private var isDone: Bool { store.isCompleted(workout) }
+    private var isSkipped: Bool { store.plan?.isSkipped(workout) == true }
+
+    /// Distance runs lead with the number; a tempo or interval session leads with its name.
+    private var leadsWithDistance: Bool {
+        [.easy, .long, .shakeout, .race].contains(workout.type) && workout.plannedMeters > 0
+    }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 14) {
+            HStack {
+                Label(workout.type.name.uppercased(), systemImage: workout.type.symbol)
+                    .font(.caption.weight(.bold)).tracking(0.8)
+                    .foregroundStyle(workout.type.tint)
+                Spacer()
+                Text(caption).font(.caption.weight(.medium)).foregroundStyle(.white.opacity(0.6))
+            }
+
+            if leadsWithDistance {
+                HStack(alignment: .firstTextBaseline, spacing: 6) {
+                    Text(Units.miles(workout.plannedMeters).formatted(.number.precision(.fractionLength(0...1))))
+                        .font(.system(size: 64, weight: .bold, design: .rounded))
+                    Text("miles").font(.title3.weight(.semibold)).foregroundStyle(.white.opacity(0.6))
+                }
+                .strikethrough(isSkipped)
+            } else {
+                Text(workout.title)
+                    .font(.system(size: 40, weight: .bold, design: .rounded))
+                    .strikethrough(isSkipped)
+            }
+
+            HStack(spacing: 22) {
+                if let pace = workout.mainPace { stat("Pace", pace.formatted) }
+                stat("Time", "~" + Formatting.minutes(workout.estimatedDuration))
+                if !leadsWithDistance, workout.plannedMeters > 0 { stat("Distance", Formatting.miles(workout.plannedMeters)) }
+            }
+
+            if isDone {
+                Label("Done", systemImage: "checkmark.circle.fill").font(.subheadline.weight(.semibold)).foregroundStyle(Color.jade)
+            } else if isSkipped {
+                Label("Skipped", systemImage: "forward.end").font(.subheadline.weight(.semibold)).foregroundStyle(.white.opacity(0.6))
+            } else if workout.type != .race {
+                RescheduleButtons(workout: workout, day: day)
+                    .tint(.white)
+                    .buttonBorderShape(.capsule)
+            }
+        }
+        .foregroundStyle(.white)
+        .padding(20)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background {
+            ZStack {
+                LinearGradient(colors: [.ink, .inkDeep], startPoint: .top, endPoint: .bottom)
+                // The same glow as the icon, in this workout's colour.
+                RadialGradient(colors: [workout.type.tint.opacity(0.45), .clear], center: .topTrailing, startRadius: 0, endRadius: 260)
+            }
+        }
+        .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
+        .overlay { RoundedRectangle(cornerRadius: 24, style: .continuous).strokeBorder(.white.opacity(0.08)) }
+        // The whole card opens the workout; the buttons on it still work on their own.
+        .background(NavigationLink(value: workout) { EmptyView() }.opacity(0))
+        .listRowInsets(EdgeInsets())
+        .listRowBackground(Color.clear)
+    }
+
+    private func stat(_ label: String, _ value: String) -> some View {
+        VStack(alignment: .leading, spacing: 2) {
+            Text(label.uppercased()).font(.caption2.weight(.semibold)).tracking(0.6).foregroundStyle(.white.opacity(0.5))
+            Text(value).font(.subheadline.weight(.semibold)).monospacedDigit()
+        }
     }
 }
 
@@ -235,7 +311,7 @@ struct WeekStrip: View {
                         Circle()
                             .fill(main.type == .rest ? Color(.tertiarySystemFill) : main.type.tint.opacity(done ? 1 : 0.25))
                         if day.workouts.count > 1 {
-                            Circle().strokeBorder(Color.indigo, lineWidth: 2)
+                            Circle().strokeBorder(WorkoutType.strength.tint, lineWidth: 2)
                         }
                         Image(systemName: done ? "checkmark" : main.type.symbol)
                             .font(.caption2.weight(.bold))
@@ -243,7 +319,7 @@ struct WeekStrip: View {
                     }
                     .frame(width: 34, height: 34)
                     .overlay {
-                        if isToday { Circle().strokeBorder(.primary, lineWidth: 1.5).padding(-3) }
+                        if isToday { Circle().strokeBorder(.stride, lineWidth: 2).padding(-3) }
                     }
                     Text(main.plannedMeters > 0 ? Units.miles(main.plannedMeters).formatted(.number.precision(.fractionLength(0...1))) : " ")
                         .font(.caption2).foregroundStyle(.secondary)

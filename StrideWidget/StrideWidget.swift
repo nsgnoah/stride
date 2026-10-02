@@ -177,7 +177,7 @@ struct TodayWidgetView: View {
                     .foregroundStyle(main.type.tint)
                 Text(main.title).font(.headline).lineLimit(2).minimumScaleFactor(0.8)
                 if isDone {
-                    Label("Done", systemImage: "checkmark").font(.caption).foregroundStyle(.green)
+                    Label("Done", systemImage: "checkmark").font(.caption).foregroundStyle(Color.jade)
                 } else if let pace = main.mainPace {
                     Text(pace.formatted).font(.caption).foregroundStyle(.secondary)
                 } else if let second = entry.workouts.dropFirst().first, entry.workouts.count > 1 {

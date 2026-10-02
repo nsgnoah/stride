@@ -115,7 +115,7 @@ struct PlanSetupView: View {
                 Section {
                     VStack(alignment: .leading, spacing: 8) {
                         Text("Run days")
-                        WeekdayPicker(selection: $profile.runDays, tint: .green)
+                        WeekdayPicker(selection: $profile.runDays, tint: .ember)
                         Text(runSummary)
                             .font(.footnote).foregroundStyle(.secondary)
                     }
@@ -209,7 +209,7 @@ struct PlanSetupView: View {
 
 struct WeekdayPicker: View {
     @Binding var selection: Set<Weekday>
-    var tint: Color = .indigo
+    var tint: Color = WorkoutType.strength.tint
 
     var body: some View {
         HStack(spacing: 6) {

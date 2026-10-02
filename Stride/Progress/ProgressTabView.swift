@@ -129,7 +129,7 @@ struct PaceChart: View {
         Chart {
             if let easyRange {
                 RectangleMark(yStart: .value("Fast", easyRange.fast / 60), yEnd: .value("Slow", easyRange.slow / 60))
-                    .foregroundStyle(.green.opacity(0.12))
+                    .foregroundStyle(Color.jade.opacity(0.12))
             }
             ForEach(runs) { run in
                 if let pace = run.averagePace {
@@ -171,7 +171,7 @@ struct ActivityRow: View {
                 } else if activity.durationSeconds > 0 {
                     Text(Formatting.minutes(activity.durationSeconds)).font(.headline)
                 } else {
-                    Image(systemName: "checkmark").foregroundStyle(.green)
+                    Image(systemName: "checkmark").foregroundStyle(Color.jade)
                 }
             }
         }

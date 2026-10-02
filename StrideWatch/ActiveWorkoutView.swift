@@ -25,7 +25,7 @@ struct CoachingView: View {
                 if let split = manager.lastSplit, Date.now < manager.splitBannerUntil {
                     Text("Mile \(split.mile) · \(Formatting.duration(split.seconds))")
                         .font(.footnote.weight(.semibold))
-                        .foregroundStyle(.green)
+                        .foregroundStyle(Color.gold)
                         .lineLimit(1)
                         .transition(.opacity)
                 } else {
@@ -83,7 +83,7 @@ struct CoachingView: View {
         .overlay(alignment: .top) {
             if manager.phase == .paused {
                 Text(manager.autoPaused ? "AUTO-PAUSED" : "PAUSED").font(.caption2.bold()).padding(.horizontal, 8).padding(.vertical, 2)
-                    .background(.yellow, in: Capsule()).foregroundStyle(.black)
+                    .background(Color.gold, in: Capsule()).foregroundStyle(.black)
                     .offset(y: -18)
             }
         }
@@ -91,9 +91,9 @@ struct CoachingView: View {
 
     private var paceColor: Color {
         switch manager.coaching {
-        case .speedUp: .orange
-        case .slowDown: .blue
-        case .onPace: .green
+        case .speedUp: .amber
+        case .slowDown: .azure
+        case .onPace: .jade
         case .none: .primary
         }
     }
@@ -122,12 +122,12 @@ struct ControlsView: View {
         VStack(spacing: 10) {
             HStack(spacing: 10) {
                 controlButton(manager.phase == .paused ? "play.fill" : "pause.fill",
-                              manager.phase == .paused ? "Resume" : "Pause", .yellow) {
+                              manager.phase == .paused ? "Resume" : "Pause", .gold) {
                     manager.togglePause()
                 }
                 controlButton("xmark", "End", .red) { manager.end() }
             }
-            controlButton("forward.end.fill", manager.nextSegment.map { "Next: \($0.name)" } ?? "Finish", .blue) {
+            controlButton("forward.end.fill", manager.nextSegment.map { "Next: \($0.name)" } ?? "Finish", .azure) {
                 manager.advanceSegment()
             }
         }

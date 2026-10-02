@@ -21,7 +21,7 @@ struct WatchHomeView: View {
                             Label("Start", systemImage: "play.fill").frame(maxWidth: .infinity)
                         }
                         .buttonStyle(.borderedProminent)
-                        .tint(.green)
+                        .tint(.ember)
 
                         if let pre = RoutineLibrary.routine(next.workout.preRoutineID) {
                             NavigationLink {
@@ -49,7 +49,7 @@ struct WatchHomeView: View {
                         Label("Voice cues", systemImage: "airpods")
                     }
                     .font(.footnote)
-                    .tint(.green)
+                    .tint(.ember)
 
                     // Lifts and mobility for today, checked off from the wrist.
                     let extras = (store.today?.workouts ?? []).filter { !$0.type.isRun && $0.type != .rest }
@@ -74,7 +74,7 @@ struct WatchHomeView: View {
                                     Connectivity.shared.send(activity: record)
                                 } label: {
                                     Image(systemName: done ? "checkmark.circle.fill" : "circle")
-                                        .foregroundStyle(done ? .green : .secondary)
+                                        .foregroundStyle(done ? Color.jade : .secondary)
                                 }
                                 .buttonStyle(.plain)
                                 .disabled(done)
@@ -95,7 +95,7 @@ struct WatchHomeView: View {
                                 Text(main.title).lineLimit(1)
                                 Spacer()
                                 if day.workouts.contains(where: { store.isCompleted($0) }) {
-                                    Image(systemName: "checkmark").foregroundStyle(.green)
+                                    Image(systemName: "checkmark").foregroundStyle(Color.jade)
                                 }
                             }
                             .font(.footnote)

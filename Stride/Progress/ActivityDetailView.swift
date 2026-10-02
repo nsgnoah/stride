@@ -99,7 +99,7 @@ struct SplitsChart: View {
         Chart {
             if let target {
                 RectangleMark(yStart: .value("Fast", target.fast / 60), yEnd: .value("Slow", target.slow / 60))
-                    .foregroundStyle(.green.opacity(0.12))
+                    .foregroundStyle(Color.jade.opacity(0.12))
             }
             ForEach(splits, id: \.mile) { split in
                 BarMark(x: .value("Mile", Double(split.mile)), yStart: .value("Floor", yDomain.lowerBound), yEnd: .value("Pace", split.seconds / 60), width: .fixed(28))
@@ -131,7 +131,7 @@ struct SplitsChart: View {
 
     private func color(for seconds: TimeInterval) -> Color {
         guard let target else { return .accentColor }
-        if target.contains(seconds) { return .green }
-        return seconds < target.fast ? .blue : .orange
+        if target.contains(seconds) { return .jade }
+        return seconds < target.fast ? .azure : .amber
     }
 }
