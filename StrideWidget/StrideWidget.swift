@@ -273,12 +273,7 @@ struct TodayWidgetBackground: View {
         case .systemSmall, .systemMedium, .systemLarge, .systemExtraLarge:
             ZStack {
                 LinearGradient(colors: [.ink, .inkDeep], startPoint: .top, endPoint: .bottom)
-                if Season.current(on: entry.date) == .halloween {
-                    // A purple haze, like the Halloween icon.
-                    RadialGradient(colors: [Color(hex: 0x7A3FD1).opacity(0.45), .clear], center: .topTrailing, startRadius: 0, endRadius: 170)
-                } else {
-                    RadialGradient(colors: [glow.opacity(0.5), .clear], center: .topTrailing, startRadius: 0, endRadius: 150)
-                }
+                RadialGradient(colors: [glow.opacity(0.5), .clear], center: .topTrailing, startRadius: 0, endRadius: 150)
             }
         default:
             Color.clear

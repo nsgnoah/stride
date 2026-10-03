@@ -1,7 +1,8 @@
 import UIKit
 
 /// Keeps the Home Screen icon in step with the season. iOS shows a small alert the
-/// first time it changes each season; after that it's quiet.
+/// first time it changes each season; after that it's quiet. Also puts back the primary
+/// icon on phones that switched to the retired Halloween one in build 12.
 enum SeasonalIcon {
     @MainActor
     static func update(for date: Date = .now) {

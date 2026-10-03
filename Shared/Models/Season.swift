@@ -1,23 +1,19 @@
 import Foundation
 
-/// The time of year, for the app icon and the widget's dressing. The runner and her
-/// ribbon stay the same; only the colours and a prop or two change.
+/// The time of year, for seasonal app icons. Only the everyday icon exists right now;
+/// a season is added with its own `AppIcon-<Name>` icon set, a case here, and its name in
+/// `ASSETCATALOG_COMPILER_ALTERNATE_APPICON_NAMES` in project.yml.
 enum Season: String, CaseIterable, Sendable {
     case standard
-    case halloween
 
     static func current(on date: Date = .now, calendar: Calendar = .current) -> Season {
-        switch calendar.component(.month, from: date) {
-        case 10: .halloween
-        default: .standard
-        }
+        .standard
     }
 
     /// The alternate app icon to show, or nil for the primary icon.
     var iconName: String? {
         switch self {
         case .standard: nil
-        case .halloween: "AppIcon-Halloween"
         }
     }
 }
