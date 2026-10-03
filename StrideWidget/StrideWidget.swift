@@ -173,17 +173,17 @@ struct TodayWidgetView: View {
                     Label(main.type.name.uppercased(), systemImage: main.type.symbol)
                         .labelStyle(.titleAndIcon)
                         .font(.system(size: 10, weight: .bold)).tracking(0.6)
-                        .foregroundStyle(main.type.tint)
+                        .foregroundStyle(Color.widgetGold)
                         .lineLimit(1)
                 } else {
                     Text(entry.date.formatted(.dateTime.weekday(.wide)).uppercased())
                         .font(.system(size: 10, weight: .bold)).tracking(0.6)
-                        .foregroundStyle(.stride)
+                        .foregroundStyle(Color.widgetGold)
                 }
                 Spacer(minLength: 0)
                 // The medium widget names the week on its other half.
                 if family != .systemMedium, let week = entry.week {
-                    Text("W\(week.number)").font(.caption2.weight(.medium)).foregroundStyle(.white.opacity(0.5))
+                    Text("W\(week.number)").font(.caption2.weight(.medium)).foregroundStyle(Color.widgetCream.opacity(0.6))
                 }
             }
             Spacer(minLength: 0)
@@ -192,7 +192,7 @@ struct TodayWidgetView: View {
                     HStack(alignment: .firstTextBaseline, spacing: 4) {
                         Text(Units.miles(main.plannedMeters).formatted(.number.precision(.fractionLength(0...1))))
                             .font(.system(size: 50, weight: .bold, design: .rounded))
-                        Text("mi").font(.headline).foregroundStyle(.white.opacity(0.6))
+                        Text("mi").font(.headline).foregroundStyle(Color.widgetCream.opacity(0.65))
                     }
                     .strikethrough(entry.skipped.contains(main.id))
                 } else {
@@ -201,21 +201,21 @@ struct TodayWidgetView: View {
                         .lineLimit(2).minimumScaleFactor(0.7)
                 }
                 if isDone {
-                    Label("Done", systemImage: "checkmark.circle.fill").font(.caption.weight(.semibold)).foregroundStyle(Color.jade)
+                    Label("Done", systemImage: "checkmark.circle.fill").font(.caption.weight(.semibold)).foregroundStyle(Color.widgetGold)
                 } else if let pace = main.mainPace {
-                    Text(pace.formatted).font(.caption.weight(.medium)).monospacedDigit().foregroundStyle(.white.opacity(0.6))
+                    Text(pace.formatted).font(.caption.weight(.medium)).monospacedDigit().foregroundStyle(Color.widgetCream.opacity(0.7))
                         .lineLimit(1).minimumScaleFactor(0.8)
                 } else if let second = entry.workouts.dropFirst().first, entry.workouts.count > 1 {
-                    Text("+ \(second.title)").font(.caption).foregroundStyle(.white.opacity(0.6))
+                    Text("+ \(second.title)").font(.caption).foregroundStyle(Color.widgetCream.opacity(0.7))
                 }
             } else {
-                Image(systemName: entry.hasPlan ? "bed.double.fill" : "figure.run").font(.title2).foregroundStyle(.white.opacity(0.5))
+                Image(systemName: entry.hasPlan ? "bed.double.fill" : "figure.run").font(.title2).foregroundStyle(Color.widgetCream.opacity(0.6))
                 Text(entry.hasPlan ? "Rest day" : "Build a plan in Stride")
                     .font(.system(size: 20, weight: .bold, design: .rounded))
                     .lineLimit(2).minimumScaleFactor(0.8)
             }
         }
-        .foregroundStyle(.white)
+        .foregroundStyle(Color.widgetCream)
     }
 
     private var medium: some View {
@@ -224,8 +224,8 @@ struct TodayWidgetView: View {
             if let week = entry.week {
                 VStack(alignment: .leading, spacing: 6) {
                     Text("WEEK \(week.number) OF \(entry.weekCount)")
-                        .font(.system(size: 10, weight: .bold)).tracking(0.6).foregroundStyle(.stride)
-                    Text(week.focus).font(.caption2).foregroundStyle(.white.opacity(0.6)).lineLimit(2)
+                        .font(.system(size: 10, weight: .bold)).tracking(0.6).foregroundStyle(Color.widgetGold)
+                    Text(week.focus).font(.caption2).foregroundStyle(Color.widgetCream.opacity(0.7)).lineLimit(2)
                     Spacer(minLength: 0)
                     HStack(spacing: 4) {
                         ForEach(week.days) { day in
@@ -234,20 +234,21 @@ struct TodayWidgetView: View {
                             let isToday = Calendar.current.isDate(day.date, inSameDayAs: entry.date)
                             VStack(spacing: 3) {
                                 Text(day.weekday.letter).font(.system(size: 9, weight: isToday ? .bold : .regular))
-                                    .foregroundStyle(.white.opacity(isToday ? 1 : 0.5))
+                                    .foregroundStyle(Color.widgetCream.opacity(isToday ? 1 : 0.55))
                                 ZStack {
-                                    Circle().fill(dayMain.type == .rest ? Color.white.opacity(0.1) : dayMain.type.tint.opacity(done ? 1 : 0.3))
+                                    // Cream like the shoe: solid once done, a wash when planned, faint on rest days.
+                                    Circle().fill(Color.widgetCream.opacity(dayMain.type == .rest ? 0.12 : (done ? 1 : 0.3)))
                                     Image(systemName: done ? "checkmark" : dayMain.type.symbol)
                                         .font(.system(size: 9, weight: .bold))
-                                        .foregroundStyle(done ? .white : (dayMain.type == .rest ? Color.white.opacity(0.4) : dayMain.type.tint))
+                                        .foregroundStyle(done ? Color(hex: 0xBB3B14) : Color.widgetCream.opacity(dayMain.type == .rest ? 0.45 : 1))
                                 }
                                 .frame(width: 22, height: 22)
-                                .overlay { if isToday { Circle().strokeBorder(.stride, lineWidth: 1.5).padding(-2) } }
+                                .overlay { if isToday { Circle().strokeBorder(Color.widgetGold, lineWidth: 1.5).padding(-2) } }
                             }
                         }
                     }
                     Text("\(Formatting.miles(week.plannedMeters, decimals: 0)) planned")
-                        .font(.caption2).foregroundStyle(.white.opacity(0.6))
+                        .font(.caption2).foregroundStyle(Color.widgetCream.opacity(0.7))
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
             }
@@ -256,25 +257,16 @@ struct TodayWidgetView: View {
     #endif
 }
 
-/// The app's ink card behind the Home Screen widgets, glowing in the colour of today's
-/// workout. Lock Screen and watch-face widgets keep the system's own backing.
+/// Behind the Home Screen widgets: the icon's rust red, sampled from the icon itself.
+/// Lock Screen and watch-face widgets keep the system's own backing.
 struct TodayWidgetBackground: View {
     @Environment(\.widgetFamily) private var family
     let entry: TodayEntry
 
-    private var glow: Color {
-        let main = entry.workouts.first { $0.type.isRun && !entry.skipped.contains($0.id) } ?? entry.workouts.first
-        guard let main, main.type != .rest else { return .ember }
-        return main.type.tint
-    }
-
     var body: some View {
         switch family {
         case .systemSmall, .systemMedium, .systemLarge, .systemExtraLarge:
-            ZStack {
-                LinearGradient(colors: [.ink, .inkDeep], startPoint: .top, endPoint: .bottom)
-                RadialGradient(colors: [glow.opacity(0.5), .clear], center: .topTrailing, startRadius: 0, endRadius: 150)
-            }
+            LinearGradient(colors: [Color(hex: 0xBB3B14), Color(hex: 0xB63812)], startPoint: .top, endPoint: .bottom)
         default:
             Color.clear
         }
@@ -288,3 +280,9 @@ struct TodayWidgetBackground: View {
     TodayEntry.placeholder
 }
 #endif
+
+/// The icon's colours, sampled from it: the shoe's cream and the leaf's gold.
+extension Color {
+    static let widgetCream = Color(hex: 0xF2DFC1)
+    static let widgetGold = Color(hex: 0xE07F1D)
+}
