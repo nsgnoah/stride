@@ -21,6 +21,7 @@ struct StrideApp: App {
                 .onChange(of: scenePhase) { _, phase in
                     // Pick up runs she logged elsewhere whenever the app comes forward.
                     // Only after she has granted access once (from Progress), never a cold prompt.
+                    if phase == .active { SeasonalIcon.update() }
                     if phase == .active, store.plan != nil {
                         Task {
                             await HealthImporter.importRuns(into: store)

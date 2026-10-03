@@ -495,3 +495,15 @@ struct PaceCalculatorTests {
         #expect(half > fiveK)
     }
 }
+
+struct SeasonTests {
+    @Test func octoberIsHalloweenAndTheRestIsStandard() {
+        let cal = PlanGeneratorTests.calendar
+        #expect(Season.current(on: PlanGeneratorTests.date(2026, 10, 1), calendar: cal) == .halloween)
+        #expect(Season.current(on: PlanGeneratorTests.date(2026, 10, 31), calendar: cal) == .halloween)
+        #expect(Season.current(on: PlanGeneratorTests.date(2026, 11, 1), calendar: cal) == .standard)
+        #expect(Season.current(on: PlanGeneratorTests.date(2026, 7, 4), calendar: cal) == .standard)
+        #expect(Season.halloween.iconName == "AppIcon-Halloween")
+        #expect(Season.standard.iconName == nil)
+    }
+}
