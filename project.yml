@@ -97,7 +97,7 @@ targets:
         WKApplication: true
         WKCompanionAppBundleIdentifier: co.nsgsolutions.Stride
         WKRunsIndependentlyOfCompanionApp: true
-        WKBackgroundModes: [workout-processing, audio]
+        WKBackgroundModes: [workout-processing]
         ITSAppUsesNonExemptEncryption: false
         NSHealthShareUsageDescription: Stride reads heart rate and distance during your run to coach your pace.
         NSHealthUpdateUsageDescription: Stride saves your runs as workouts in Health.
