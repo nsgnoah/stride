@@ -37,8 +37,15 @@ final class WorkoutManager: NSObject {
     private var lastVoiceAlert: Date = .distantPast
 
     private func say(_ line: VoiceLine) {
-        guard voiceEnabled else { return }
+        guard voiceEnabled else { VoiceLog.note("muted: \(line.text)"); return }
         voice.speak(line)
+    }
+
+    /// From the home screen: says a nudge so she can check the voice and its route
+    /// (AirPods or the watch) without starting a run.
+    func testVoice() {
+        VoiceLog.note("— voice test —")
+        voice.speak(VoiceScript.nudge(.speedUp, current: 790, target: PaceRange(fast: 698, slow: 753)))
     }
     private var movingUpdates = 0
     private var countdownFired: Set<Int> = []
@@ -373,6 +380,9 @@ final class WorkoutManager: NSObject {
         }
         let changed = newCoaching != coaching
         coaching = newCoaching
+        if changed {
+            VoiceLog.note("pace \(pace.formatted) vs \(target.formatted) → \(newCoaching)")
+        }
 
         // Back in the window after being told off: one quiet confirmation.
         if changed, newCoaching == .onPace, Date.now.timeIntervalSince(lastVoiceAlert) < 90 {

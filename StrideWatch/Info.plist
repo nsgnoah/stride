@@ -33,6 +33,7 @@
 	<key>WKBackgroundModes</key>
 	<array>
 		<string>workout-processing</string>
+		<string>audio</string>
 	</array>
 	<key>WKCompanionAppBundleIdentifier</key>
 	<string>co.nsgsolutions.Stride</string>

@@ -48,6 +48,13 @@ struct WatchHomeView: View {
                     }
                     .font(.footnote)
                     .tint(.ember)
+                    HStack {
+                        Button("Test voice") { manager.testVoice() }
+                            .buttonStyle(.bordered).controlSize(.small)
+                        NavigationLink("Voice log") { VoiceLogView() }
+                            .buttonStyle(.bordered).controlSize(.small)
+                    }
+                    .font(.footnote)
 
                     // Lifts and mobility for today, checked off from the wrist.
                     let extras = (store.today?.workouts ?? []).filter { !$0.type.isRun && $0.type != .rest }
@@ -147,6 +154,27 @@ struct WorkoutCard: View {
                 .lineLimit(1).minimumScaleFactor(0.8)
         }
         .inkCard(glow: workout.type.tint)
+    }
+}
+
+/// What the coach tried to say recently, newest first.
+struct VoiceLogView: View {
+    @State private var entries: [String] = []
+
+    var body: some View {
+        List {
+            if entries.isEmpty {
+                Text("Nothing yet. Cues are noted here as they're spoken.").foregroundStyle(.secondary)
+            }
+            ForEach(Array(entries.reversed().enumerated()), id: \.offset) { _, line in
+                Text(line).font(.caption2).monospacedDigit()
+            }
+            if !entries.isEmpty {
+                Button("Clear", role: .destructive) { VoiceLog.clear(); entries = [] }
+            }
+        }
+        .navigationTitle("Voice log")
+        .onAppear { entries = VoiceLog.entries }
     }
 }
 
