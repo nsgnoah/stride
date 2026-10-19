@@ -24,6 +24,12 @@ struct ActivityDetailView: View {
                 .padding(.vertical, 4)
             } header: {
                 Text(activity.date.formatted(.dateTime.weekday(.wide).month().day().hour().minute()))
+            } footer: {
+                let records = PersonalBests(activities: store.activities).titles(for: activity.id)
+                if !records.isEmpty {
+                    Label("Personal best: " + records.joined(separator: ", "), systemImage: "trophy")
+                        .foregroundStyle(.tint)
+                }
             }
 
             if let planned {
