@@ -8,7 +8,7 @@ A running coach for iPhone + Apple Watch. Tell it the distance you're building t
 - **Setup** — goal (5K / 10K / half / marathon), race day, runs per week, lifting days, long-run day, current mileage, one recent run. Training paces preview live.
 - **Today** — the week at a glance (lifts included), today's session with its warm-up / watch segments / cool-down, missed runs with *Do it today* / *Skip*, log a lift.
 - **Plan** — every week, expandable; planned vs. done mileage. Any workout can be moved to another day or skipped from its detail screen.
-- **Progress** — planned-vs-actual weekly miles, easy-pace trend, this week's totals (runs, lifts, mobility), history with per-run detail and mile splits. Import runs recorded with the Workout app or another tracker from Apple Health.
+- **Progress** — planned-vs-actual weekly miles, easy-pace trend, this week's totals (runs, lifts, mobility), personal bests (longest run, fastest mile, fastest 5K / 10K / half / marathon-or-longer, biggest week — each opens the run that set it, and the run's detail screen says which records it holds), history with per-run detail and mile splits. Import runs recorded with the Workout app or another tracker from Apple Health.
 - **Settings** — paces, morning reminder on run days, update paces from a recorded tempo/race, rebuild the plan (keeps week numbers, finished runs, skips and moved days), the full routine library, privacy/medical notes.
 - **Widget** — today's run and the week on the Home Screen and Lock Screen.
 

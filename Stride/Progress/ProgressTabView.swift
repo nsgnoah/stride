@@ -39,6 +39,13 @@ struct ProgressTabView: View {
                     }
                 }
 
+                let bests = PersonalBests(activities: store.activities)
+                if !bests.isEmpty {
+                    Section("Personal bests") {
+                        PersonalBestRows(bests: bests)
+                    }
+                }
+
                 Section {
                     if store.activities.isEmpty {
                         Text("Runs from the watch show up here.").foregroundStyle(.secondary)
@@ -183,6 +190,43 @@ struct PaceChart: View {
             }
         }
         .chartYAxisLabel("min/mi (faster ↑)")
+    }
+}
+
+/// One row per record; each opens the run that set it.
+struct PersonalBestRows: View {
+    @Environment(AppStore.self) private var store
+    let bests: PersonalBests
+
+    var body: some View {
+        if let r = bests.longestRun { row("Longest run", Formatting.miles(r.value, decimals: 2), r, symbol: "point.topleft.down.to.point.bottomright.curvepath") }
+        if let r = bests.fastestMile { row("Fastest mile", Formatting.duration(r.value), r, symbol: "bolt") }
+        ForEach(GoalDistance.allCases) { goal in
+            if let r = bests.fastestPace[goal] {
+                row(PersonalBests.fastestTitle(goal), r.value.formattedPerMile, r, symbol: "stopwatch")
+            }
+        }
+        if let r = bests.biggestWeek {
+            row("Biggest week", Formatting.miles(r.value), r, symbol: "calendar", dateText: "Week of " + r.date.formatted(.dateTime.month().day()))
+        }
+    }
+
+    @ViewBuilder
+    private func row(_ title: String, _ value: String, _ record: PersonalBests.Record, symbol: String, dateText: String? = nil) -> some View {
+        let label = HStack(spacing: 12) {
+            Image(systemName: symbol).foregroundStyle(.tint).frame(width: 28)
+            VStack(alignment: .leading, spacing: 2) {
+                Text(title).font(.headline)
+                Text(dateText ?? record.date.formatted(.dateTime.month().day().year())).font(.caption).foregroundStyle(.secondary)
+            }
+            Spacer()
+            Text(value).font(.headline).monospacedDigit()
+        }
+        if let activity = record.activityID.flatMap({ id in store.activities.first { $0.id == id } }) {
+            NavigationLink(value: activity) { label }
+        } else {
+            label
+        }
     }
 }
 
